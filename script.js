@@ -139,6 +139,7 @@ const VOCAL_PHRASE_INTERVAL_MS = 1650;
 const VOCAL_RATE = 1.18;
 const VOCAL_PITCH_STANDARD = 1.18;
 const VOCAL_PITCH_HIGH = 1.32;
+const HIGH_PITCH_VOCAL_INDICES = new Set([1, 3]);
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
@@ -439,7 +440,7 @@ function playVictoryVocals(primaryPhrase) {
             const msg = new SpeechSynthesisUtterance(line);
             msg.lang = 'en-GB';
             msg.rate = VOCAL_RATE;
-            const useHighPitch = index === 1 || index === 3;
+            const useHighPitch = HIGH_PITCH_VOCAL_INDICES.has(index);
             msg.pitch = useHighPitch ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
             msg.volume = 1;
             if (femaleVoice) msg.voice = femaleVoice;
