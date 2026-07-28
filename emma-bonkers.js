@@ -27,7 +27,7 @@
  *   viz.stop();                     // early manual stop
  *
  * Graceful degradation:
- *   If imgEl has not loaded (or emma.jpg is missing), each particle slot is
+ *   If imgEl has not loaded (or emma.png is missing), each particle slot is
  *   rendered as a colourful emoji avatar instead.
  * ──────────────────────────────────────────────────────────────────────────
  */
