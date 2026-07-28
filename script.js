@@ -134,9 +134,10 @@ const VICTORY_MUSIC_BPM = 138;
 /* Fast trance-style 8-step patterns */
 const VICTORY_MELODY_NOTES = [74, 76, 79, 81, 79, 76, 74, 72];
 const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
-const MAX_PHRASE_SELECTION_RETRIES = 6;
 const VOCAL_INITIAL_DELAY_MS = 120;
 const VOCAL_PHRASE_INTERVAL_MS = 1650;
+const VOCAL_PITCH_STANDARD = 1.18;
+const VOCAL_PITCH_HIGH = 1.32;
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
@@ -409,11 +410,9 @@ function playVictoryMusic() {
 }
 
 function randomPhraseExcluding(exclude) {
-    let phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-    for (let i = 0; i < MAX_PHRASE_SELECTION_RETRIES && exclude.has(phrase); i++) {
-        phrase = PHRASES[Math.floor(Math.random() * PHRASES.length)];
-    }
-    return phrase;
+    const candidates = PHRASES.filter(phrase => !exclude.has(phrase));
+    if (!candidates.length) return PHRASES[Math.floor(Math.random() * PHRASES.length)];
+    return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
 function playVictoryVocals(primaryPhrase) {
@@ -439,7 +438,7 @@ function playVictoryVocals(primaryPhrase) {
             const msg = new SpeechSynthesisUtterance(line);
             msg.lang = 'en-GB';
             msg.rate = 1.18;
-            msg.pitch = index % 2 ? 1.32 : 1.18;
+            msg.pitch = index % 2 ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
             msg.volume = 1;
             if (femaleVoice) msg.voice = femaleVoice;
             window.speechSynthesis.speak(msg);
