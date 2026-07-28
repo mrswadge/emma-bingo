@@ -38,7 +38,7 @@ class EmmaBonkersViz {
     static BASE_EMMAS    = 4;
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS     = 52;
-    static KALEIDOSCOPE_OVERSCAN = 1.14;
+    static KALEIDOSCOPE_OVERSCAN = 1.14; // 14% overscan prevents edge exposure while rotating
 
     constructor(canvas, imgEl) {
         this.canvas     = canvas;

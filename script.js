@@ -122,7 +122,14 @@ const EMMA_EXCLAMATIONS = [
 ];
 
 /* Common female voice labels seen across major browser/platform voice packs. */
-const FEMALE_VOICE_HINTS = /(female|woman|samantha|victoria|karen|zira|hazel|susan|serena|aria|libby|sonia|ava|allison|joanna|amy|emma|olivia|salli|raveena|moira|kendra|google uk english female)/i;
+const FEMALE_VOICE_NAMES = [
+    'female', 'woman', 'samantha', 'victoria', 'karen', 'zira', 'hazel', 'susan',
+    'serena', 'aria', 'libby', 'sonia', 'ava', 'allison', 'joanna', 'amy', 'emma',
+    'olivia', 'salli', 'raveena', 'moira', 'kendra', 'google uk english female'
+];
+const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
+const MIN_BOARD_SIZE = 3;
+const MAX_BOARD_SIZE = 7;
 const VICTORY_MUSIC_BPM = 98;
 /* D4, E4, G4, A4, G4, E4, D4, C4 */
 const VICTORY_MELODY_NOTES = [62, 64, 67, 69, 67, 64, 62, 60];
@@ -231,7 +238,7 @@ function parseUrlState() {
 
     return {
         mode: modeParam === 'custom' || modeParam === 'weekly' ? modeParam : null,
-        size: Number.isInteger(sizeParam) && sizeParam >= 3 && sizeParam <= 7 ? sizeParam : null,
+        size: Number.isInteger(sizeParam) && sizeParam >= MIN_BOARD_SIZE && sizeParam <= MAX_BOARD_SIZE ? sizeParam : null,
         seed: Number.isInteger(seedNum) && seedNum >= 0 && seedNum <= 0xFFFFFFFF ? (seedNum >>> 0) : null
     };
 }
@@ -558,7 +565,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
         /* Prime voice loading early so female voice selection is ready on win. */
         window.speechSynthesis.getVoices();
-        window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices(), { once: true });
+        window.speechSynthesis.addEventListener('voiceschanged', () => getFemaleVoice(), { once: true });
     }
 
     document.addEventListener('pointerdown', () => { ensureWinAudioContext(); }, { once: true });
