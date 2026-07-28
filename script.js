@@ -410,9 +410,9 @@ function playVictoryMusic() {
     winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
 }
 
-function randomPhraseExcluding(exclude) {
-    const candidates = PHRASES.filter(phrase => !exclude.has(phrase));
-    if (!candidates.length) return PHRASES[Math.floor(Math.random() * PHRASES.length)];
+function randomPhraseExcluding(pool, exclude) {
+    const candidates = pool.filter(phrase => !exclude.has(phrase));
+    if (!candidates.length) return pool[Math.floor(Math.random() * pool.length)];
     return candidates[Math.floor(Math.random() * candidates.length)];
 }
 
@@ -423,9 +423,9 @@ function playVictoryVocals(primaryPhrase) {
 
     const femaleVoice = getFemaleVoice();
     const used = new Set([primaryPhrase]);
-    const extraA = randomPhraseExcluding(used);
+    const extraA = randomPhraseExcluding(PHRASES, used);
     used.add(extraA);
-    const extraB = randomPhraseExcluding(used);
+    const extraB = randomPhraseExcluding(PHRASES, used);
 
     const vocalLines = [
         'EMMA BINGO!',
@@ -439,7 +439,8 @@ function playVictoryVocals(primaryPhrase) {
             const msg = new SpeechSynthesisUtterance(line);
             msg.lang = 'en-GB';
             msg.rate = VOCAL_RATE;
-            msg.pitch = index % 2 ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
+            const useHighPitch = index === 1 || index === 3;
+            msg.pitch = useHighPitch ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
             msg.volume = 1;
             if (femaleVoice) msg.voice = femaleVoice;
             window.speechSynthesis.speak(msg);
