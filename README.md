@@ -40,6 +40,8 @@ The animation uses `emma.png` in the repository root. Add the photo to unlock th
 2. Commit it to the repository root
 3. The animation will automatically use it
 
+If you currently have `emma.jpg`, rename it to `emma.png`.
+
 Without `emma.png` the animation still runs — each particle slot shows a 👸 emoji avatar instead.
 
 

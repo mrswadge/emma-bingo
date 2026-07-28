@@ -94,9 +94,12 @@ class EmmaBonkersViz {
         if (!this.running || this.tapLevel >= EmmaBonkersViz.MAX_TAPS) return;
         this.tapLevel++;
         this.paletteShift = Math.random() * 360;
-        for (const p of this.particles) {
-            p.hue = Math.random() * 360;
-            p.hueSpeed = (Math.random() - 0.5) * 180;
+        /* Re-colour all active particles so each tap visibly shifts the palette. */
+        if (this.particles.length) {
+            for (const p of this.particles) {
+                p.hue = Math.random() * 360;
+                p.hueSpeed = (Math.random() - 0.5) * 180;
+            }
         }
         const room  = EmmaBonkersViz.MAX_EMMAS - this.particles.length;
         const extra = Math.min(EmmaBonkersViz.EMMAS_PER_TAP + this.tapLevel, room);

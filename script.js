@@ -131,9 +131,9 @@ const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
 const MIN_BOARD_SIZE = 3;
 const MAX_BOARD_SIZE = 7;
 const VICTORY_MUSIC_BPM = 98;
-/* D4, E4, G4, A4, G4, E4, D4, C4 */
+/* Melody MIDI notes: 62,64,67,69,67,64,62,60 */
 const VICTORY_MELODY_NOTES = [62, 64, 67, 69, 67, 64, 62, 60];
-/* D2, D2, F2, F2, C2, C2, A1, A1 */
+/* Bass MIDI notes: 38,38,41,41,36,36,33,33 */
 const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
@@ -326,7 +326,7 @@ function playVictoryMusic() {
 
             const lead = ctx.createOscillator();
             const leadGain = ctx.createGain();
-            /* Alternate waveforms for a brighter pop lead line */
+            /* Alternate odd/even notes so transients cut through while staying warm. */
             lead.type = i % 2 ? 'triangle' : 'sawtooth';
             lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[i]), t0);
             leadGain.gain.setValueAtTime(0, t0);
