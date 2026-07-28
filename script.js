@@ -130,11 +130,16 @@ const FEMALE_VOICE_NAMES = [
 const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
 const MIN_BOARD_SIZE = 3;
 const MAX_BOARD_SIZE = 7;
-const VICTORY_MUSIC_BPM = 98;
-/* Melody MIDI notes: 62,64,67,69,67,64,62,60 */
-const VICTORY_MELODY_NOTES = [62, 64, 67, 69, 67, 64, 62, 60];
-/* Bass MIDI notes: 38,38,41,41,36,36,33,33 */
+const VICTORY_MUSIC_BPM = 138;
+/* Fast trance-style 8-step patterns */
+const VICTORY_MELODY_NOTES = [74, 76, 79, 81, 79, 76, 74, 72];
 const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
+const VOCAL_INITIAL_DELAY_MS = 120;
+const VOCAL_PHRASE_INTERVAL_MS = 1650;
+const VOCAL_RATE = 1.18;
+const VOCAL_PITCH_STANDARD = 1.18;
+const VOCAL_PITCH_HIGH = 1.32;
+const HIGH_PITCH_VOCAL_INDICES = new Set([1, 3]);
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
@@ -263,6 +268,7 @@ let victoryViz = null;
 let winAudioCtx  = null;
 let winAudioNodes = [];
 let winAudioStopTimer = null;
+let winSpeechTimers = [];
 
 function getFemaleVoice() {
     if (!('speechSynthesis' in window)) return null;
@@ -299,6 +305,12 @@ function stopVictoryMusic() {
     winAudioNodes = [];
 }
 
+function stopVictoryVocals() {
+    for (const timer of winSpeechTimers) clearTimeout(timer);
+    winSpeechTimers = [];
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
 function midiToFreq(note) {
     return 440 * Math.pow(2, (note - 69) / 12);
 }
@@ -311,51 +323,131 @@ function playVictoryMusic() {
 
     const now = ctx.currentTime + 0.03;
     const beat = 60 / VICTORY_MUSIC_BPM;
-    const loops = 4;
+    const bars = 8;
+    const stepsPerBeat = 2;
+    const step = beat / stepsPerBeat;
+    const totalSteps = bars * 4 * stepsPerBeat;
 
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.linearRampToValueAtTime(0.18, now + 0.3);
+    master.gain.linearRampToValueAtTime(0.22, now + 0.2);
     master.connect(ctx.destination);
     winAudioNodes.push(master);
 
-    for (let loop = 0; loop < loops; loop++) {
-        const loopStart = now + loop * VICTORY_MELODY_NOTES.length * beat;
-        for (let i = 0; i < VICTORY_MELODY_NOTES.length; i++) {
-            const t0 = loopStart + i * beat;
-            const t1 = t0 + beat * 0.95;
-
-            const lead = ctx.createOscillator();
-            const leadGain = ctx.createGain();
-            /* Triangle on odd indices, sawtooth on even indices for alternating tone color. */
-            lead.type = i % 2 ? 'triangle' : 'sawtooth';
-            lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[i]), t0);
-            leadGain.gain.setValueAtTime(0, t0);
-            leadGain.gain.linearRampToValueAtTime(0.11, t0 + 0.02);
-            leadGain.gain.exponentialRampToValueAtTime(0.0001, t1);
-            lead.connect(leadGain);
-            leadGain.connect(master);
-            lead.start(t0);
-            lead.stop(t1 + 0.01);
-            winAudioNodes.push(lead, leadGain);
-
-            const low = ctx.createOscillator();
-            const lowGain = ctx.createGain();
-            low.type = 'square';
-            low.frequency.setValueAtTime(midiToFreq(VICTORY_BASS_NOTES[i]), t0);
-            lowGain.gain.setValueAtTime(0, t0);
-            lowGain.gain.linearRampToValueAtTime(0.08, t0 + 0.015);
-            lowGain.gain.exponentialRampToValueAtTime(0.0001, t0 + beat * 0.8);
-            low.connect(lowGain);
-            lowGain.connect(master);
-            low.start(t0);
-            low.stop(t0 + beat * 0.82);
-            winAudioNodes.push(low, lowGain);
-        }
+    /* Pumping sidechain-style volume motion */
+    for (let b = 0; b < bars * 4; b++) {
+        const bt = now + b * beat;
+        master.gain.setValueAtTime(0.2, bt);
+        master.gain.exponentialRampToValueAtTime(0.11, bt + 0.08);
+        master.gain.linearRampToValueAtTime(0.2, bt + beat * 0.9);
     }
 
-    const totalDurationMs = (loops * VICTORY_MELODY_NOTES.length * beat + 0.6) * 1000;
+    for (let s = 0; s < totalSteps; s++) {
+        const t0 = now + s * step;
+
+        /* Four-on-the-floor kick */
+        if (s % stepsPerBeat === 0) {
+            const kick = ctx.createOscillator();
+            const kickGain = ctx.createGain();
+            kick.type = 'sine';
+            kick.frequency.setValueAtTime(155, t0);
+            kick.frequency.exponentialRampToValueAtTime(42, t0 + 0.09);
+            kickGain.gain.setValueAtTime(0.0001, t0);
+            kickGain.gain.exponentialRampToValueAtTime(0.42, t0 + 0.003);
+            kickGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.11);
+            kick.connect(kickGain);
+            kickGain.connect(master);
+            kick.start(t0);
+            kick.stop(t0 + 0.12);
+            winAudioNodes.push(kick, kickGain);
+        }
+
+        /* Bright off-beat hat */
+        if (s % stepsPerBeat === 1) {
+            const hat = ctx.createOscillator();
+            const hatGain = ctx.createGain();
+            hat.type = 'square';
+            hat.frequency.setValueAtTime(9200, t0);
+            hatGain.gain.setValueAtTime(0.0001, t0);
+            hatGain.gain.exponentialRampToValueAtTime(0.08, t0 + 0.002);
+            hatGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.03);
+            hat.connect(hatGain);
+            hatGain.connect(master);
+            hat.start(t0);
+            hat.stop(t0 + 0.035);
+            winAudioNodes.push(hat, hatGain);
+        }
+
+        const noteIndex = s % VICTORY_MELODY_NOTES.length;
+
+        const bass = ctx.createOscillator();
+        const bassGain = ctx.createGain();
+        bass.type = 'square';
+        bass.frequency.setValueAtTime(midiToFreq(VICTORY_BASS_NOTES[noteIndex]), t0);
+        bassGain.gain.setValueAtTime(0.0001, t0);
+        bassGain.gain.exponentialRampToValueAtTime(0.085, t0 + 0.01);
+        bassGain.gain.exponentialRampToValueAtTime(0.0001, t0 + step * 0.9);
+        bass.connect(bassGain);
+        bassGain.connect(master);
+        bass.start(t0);
+        bass.stop(t0 + step * 0.95);
+        winAudioNodes.push(bass, bassGain);
+
+        const lead = ctx.createOscillator();
+        const leadGain = ctx.createGain();
+        lead.type = 'sawtooth';
+        lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[noteIndex]), t0);
+        leadGain.gain.setValueAtTime(0.0001, t0);
+        leadGain.gain.exponentialRampToValueAtTime(0.09, t0 + 0.01);
+        leadGain.gain.exponentialRampToValueAtTime(0.0001, t0 + step * 0.75);
+        lead.connect(leadGain);
+        leadGain.connect(master);
+        lead.start(t0);
+        lead.stop(t0 + step * 0.8);
+        winAudioNodes.push(lead, leadGain);
+    }
+
+    const totalDurationMs = (totalSteps * step + 0.8) * 1000;
     winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
+}
+
+function randomPhraseExcluding(pool, exclude) {
+    const candidates = pool.filter(phrase => !exclude.has(phrase));
+    if (!candidates.length) return pool[Math.floor(Math.random() * pool.length)];
+    return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+function playVictoryVocals(primaryPhrase) {
+    if (!('speechSynthesis' in window)) return;
+
+    stopVictoryVocals();
+
+    const femaleVoice = getFemaleVoice();
+    const used = new Set([primaryPhrase]);
+    const extraA = randomPhraseExcluding(PHRASES, used);
+    used.add(extraA);
+    const extraB = randomPhraseExcluding(PHRASES, used);
+
+    const vocalLines = [
+        'EMMA BINGO!',
+        primaryPhrase,
+        extraA,
+        extraB
+    ];
+
+    vocalLines.forEach((line, index) => {
+        const timer = setTimeout(() => {
+            const msg = new SpeechSynthesisUtterance(line);
+            msg.lang = 'en-GB';
+            msg.rate = VOCAL_RATE;
+            const useHighPitch = HIGH_PITCH_VOCAL_INDICES.has(index);
+            msg.pitch = useHighPitch ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
+            msg.volume = 1;
+            if (femaleVoice) msg.voice = femaleVoice;
+            window.speechSynthesis.speak(msg);
+        }, VOCAL_INITIAL_DELAY_MS + index * VOCAL_PHRASE_INTERVAL_MS);
+        winSpeechTimers.push(timer);
+    });
 }
 
 /* ── Font Sizes ──────────────────────────────────────────────────────────────
@@ -477,20 +569,7 @@ function triggerVictory() {
     box.classList.add('box-hidden');
     box.classList.remove('box-revealed');
 
-    /* Speech synthesis */
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const femaleVoice = getFemaleVoice();
-        const msg  = new SpeechSynthesisUtterance(`EMMA BINGO! ${phrase}`);
-        msg.lang   = 'en-GB';
-        msg.rate   = 0.78;
-        msg.pitch  = 1.3;
-        msg.volume = 1;
-        if (femaleVoice) msg.voice = femaleVoice;
-        /* Small delay avoids Chrome cutting off the first syllable */
-        setTimeout(() => window.speechSynthesis.speak(msg), 120);
-    }
-
+    playVictoryVocals(phrase);
     playVictoryMusic();
 
     /* Start the EmmaBonkersViz animation */
@@ -513,7 +592,7 @@ function closeVictory() {
     overlay.classList.remove('viz-active');
     box.classList.remove('box-hidden', 'box-revealed');
     if (victoryViz) { victoryViz.stop(); victoryViz = null; }
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    stopVictoryVocals();
     stopVictoryMusic();
 }
 
