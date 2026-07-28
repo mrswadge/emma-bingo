@@ -50,6 +50,7 @@ class EmmaBonkersViz {
         this.tapLevel   = 0;
         this.particles  = [];
         this.onComplete = null;            // () => void  callback at 60 s
+        this.paletteShift = Math.random() * 360;
 
         /* Offscreen buffers:
            _buf  – copy of the previous rendered frame (feedback source)
@@ -91,6 +92,11 @@ class EmmaBonkersViz {
     onTap() {
         if (!this.running || this.tapLevel >= EmmaBonkersViz.MAX_TAPS) return;
         this.tapLevel++;
+        this.paletteShift = Math.random() * 360;
+        for (const p of this.particles) {
+            p.hue = Math.random() * 360;
+            p.hueSpeed = (Math.random() - 0.5) * 180;
+        }
         const room  = EmmaBonkersViz.MAX_EMMAS - this.particles.length;
         const extra = Math.min(EmmaBonkersViz.EMMAS_PER_TAP + this.tapLevel, room);
         if (extra > 0) this._spawn(extra, true /* burst */);
@@ -172,8 +178,8 @@ class EmmaBonkersViz {
            centre.  The slight zoom creates the infinite-tunnel pull-in.
            globalAlpha < 1 makes old content decay, preventing blow-up.     */
         const feedAlpha = useKaleo ? 0.82 : 0.89;
-        const zoom      = 1.012 + intensity * 0.010;
-        const swirl     = (0.004 + intensity * 0.012) * Math.sin(t * 0.27);
+        const zoom      = 1.004 + intensity * 0.004;
+        const swirl     = (0.0018 + intensity * 0.0042) * Math.sin(t * 0.27);
         tCtx.save();
         tCtx.globalAlpha = feedAlpha;
         tCtx.translate(W / 2, H / 2);
@@ -231,7 +237,7 @@ class EmmaBonkersViz {
             const gy  = H / 2 + Math.cos(t * sp * 0.53 + i * 1.571) * H * 0.43;
             const rad = W * (0.27 + 0.23 * Math.sin(t * 0.33 + i * 1.1));
             /* Golden-angle hue spacing gives nice colour variety */
-            const hue = (t * 42 + i * 137.508) % 360;
+            const hue = (this.paletteShift + t * 42 + i * 137.508) % 360;
             const g   = ctx.createRadialGradient(gx, gy, 0, gx, gy, rad);
             g.addColorStop(0,   `hsl(${hue}, 100%, 68%)`);
             g.addColorStop(0.5, `hsl(${(hue + 55) % 360}, 100%, 48%)`);
@@ -245,12 +251,13 @@ class EmmaBonkersViz {
     /* ── Emma sprite particles ────────────────────────────────────────────── */
     _emmas(ctx, t, dt, intensity, W, H) {
         const hasPhoto    = this.img && this.img.complete && this.img.naturalWidth > 0;
-        const baseSize    = Math.min(W, H) * (0.09 + intensity * 0.10);
+        const baseSize    = Math.min(W, H) * (0.14 + intensity * 0.10);
         const forceTunnel = this.tapLevel >= 5;
 
         /* Precompute intensity-driven filter values once for all particles */
-        const bri = (1.1 + intensity * 0.45).toFixed(2);
-        const sat = (1.4 + intensity * 1.6).toFixed(2);
+        const bri = (1.18 + intensity * 0.22).toFixed(2);
+        const sat = (1.35 + intensity * 0.85).toFixed(2);
+        const con = (1.12 + intensity * 0.2).toFixed(2);
         const briFallback = (1.2 + intensity * 0.5).toFixed(2);
 
         for (const p of this.particles) {
@@ -298,7 +305,8 @@ class EmmaBonkersViz {
             ctx.globalAlpha = p.alpha;
 
             if (hasPhoto) {
-                ctx.filter = `hue-rotate(${p.hue | 0}deg) brightness(${bri}) saturate(${sat})`;
+                const hueRotate = ((p.hue * 0.45 + this.paletteShift) | 0) % 360;
+                ctx.filter = `hue-rotate(${hueRotate}deg) brightness(${bri}) saturate(${sat}) contrast(${con})`;
                 ctx.drawImage(this.img, -sz / 2, -sz / 2, sz, sz);
             } else {
                 /* Emoji fallback: drawn as coloured circle + 👸 */
@@ -339,14 +347,15 @@ class EmmaBonkersViz {
             this.ctx.beginPath();
             this.ctx.moveTo(0, 0);
             /* Use cached hypotenuse so the clip covers the entire canvas corner */
-            this.ctx.arc(0, 0, this._hypot, 0, segAngle);
+            this.ctx.arc(0, 0, this._hypot + 4, -0.012, segAngle + 0.012);
             this.ctx.closePath();
             this.ctx.clip();
 
             /* Flip every other slice to create true mirror symmetry */
             if (i % 2 === 1) this.ctx.scale(-1, 1);
 
-            this.ctx.drawImage(this._tmp, -W / 2, -H / 2);
+            const over = 1.14;
+            this.ctx.drawImage(this._tmp, -W * over / 2, -H * over / 2, W * over, H * over);
             this.ctx.restore();
         }
         this.ctx.restore();
@@ -367,7 +376,7 @@ class EmmaBonkersViz {
             const ph  = i * 2.094 + t * (0.45 + i * 0.18);
             const sc  = 0.7 + Math.abs(Math.sin(ph * 0.55)) * 2.0 * (0.6 + intensity * 0.4);
             const alp = 0.35 + Math.abs(Math.sin(ph * 0.4)) * 0.6;
-            const hue = (t * 48 + i * 137.508) % 360;
+            const hue = (this.paletteShift + t * 48 + i * 137.508) % 360;
             const fs  = Math.max(13, Math.min(W, H) * 0.033 * sc);
             const x   = W / 2 + Math.cos(ph * 0.78 + i * 1.1) * W * 0.24 * (0.4 + intensity * 0.6);
             const y   = H / 2 + Math.sin(ph * 0.64 + i * 0.9) * H * 0.24 * (0.4 + intensity * 0.6);
