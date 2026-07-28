@@ -38,7 +38,7 @@ class EmmaBonkersViz {
     static BASE_EMMAS    = 4;
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS     = 52;
-    static KALEIDOSCOPE_OVERSCAN = 1.14; // 14% overscan prevents edge exposure while rotating
+    /* KALEIDOSCOPE_OVERSCAN is now computed per-resize as this._kaleOver */
     static HUE_SCALE_FACTOR = 0.45; // blend per-particle hue with tap palette shift
 
     constructor(canvas, imgEl) {
@@ -114,8 +114,11 @@ class EmmaBonkersViz {
         for (const c of [this.canvas, this._buf, this._tmp]) {
             c.width = W; c.height = H;
         }
-        /* Cache for kaleidoscope — only changes on resize */
-        this._hypot = Math.hypot(W, H);
+        /* Cache for kaleidoscope — only changes on resize.
+           Overscan must be at least hypot/min(W,H) so every canvas corner is
+           covered by the source image in every slice, regardless of aspect ratio. */
+        this._hypot               = Math.hypot(W, H);
+        this._kaleidoscopeOverscan = this._hypot / Math.min(W, H);
     }
 
     /* ── Spawn new Emma particles ─────────────────────────────────────────
@@ -257,7 +260,7 @@ class EmmaBonkersViz {
     /* ── Emma sprite particles ────────────────────────────────────────────── */
     _emmas(ctx, t, dt, intensity, W, H) {
         const hasPhoto    = this.img && this.img.complete && this.img.naturalWidth > 0;
-        const baseSize    = Math.min(W, H) * (0.14 + intensity * 0.10);
+        const baseSize    = Math.min(W, H) * (0.35 + intensity * 0.25);
         const forceTunnel = this.tapLevel >= 5;
 
         /* Precompute intensity-driven filter values once for all particles */
@@ -360,7 +363,7 @@ class EmmaBonkersViz {
             /* Flip every other slice to create true mirror symmetry */
             if (i % 2 === 1) this.ctx.scale(-1, 1);
 
-            const over = EmmaBonkersViz.KALEIDOSCOPE_OVERSCAN;
+            const over = this._kaleidoscopeOverscan;
             this.ctx.drawImage(this._tmp, -W * over / 2, -H * over / 2, W * over, H * over);
             this.ctx.restore();
         }

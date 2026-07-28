@@ -270,8 +270,9 @@ function getFemaleVoice() {
     if (!voices.length) return null;
 
     const englishVoices = voices.filter(v => /^en(-|$)/i.test(v.lang));
-    const preferred = englishVoices.length ? englishVoices : voices;
-    return preferred.find(v => FEMALE_VOICE_HINTS.test(v.name)) || preferred[0] || null;
+    const englishVoicePool = englishVoices.length ? englishVoices : [];
+    /* Prefer a named female English voice; fall back to any English voice */
+    return englishVoicePool.find(v => FEMALE_VOICE_HINTS.test(v.name)) || englishVoicePool[0] || null;
 }
 
 function ensureWinAudioContext() {
@@ -480,16 +481,14 @@ function triggerVictory() {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const femaleVoice = getFemaleVoice();
-        if (femaleVoice) {
-            const msg  = new SpeechSynthesisUtterance(`EMMA BINGO! ${phrase}`);
-            msg.lang   = femaleVoice.lang || 'en-GB';
-            msg.rate   = 0.78;
-            msg.pitch  = 1.3;
-            msg.volume = 1;
-            msg.voice  = femaleVoice;
-            /* Small delay avoids Chrome cutting off the first syllable */
-            setTimeout(() => window.speechSynthesis.speak(msg), 120);
-        }
+        const msg  = new SpeechSynthesisUtterance(`EMMA BINGO! ${phrase}`);
+        msg.lang   = 'en-GB';
+        msg.rate   = 0.78;
+        msg.pitch  = 1.3;
+        msg.volume = 1;
+        if (femaleVoice) msg.voice = femaleVoice;
+        /* Small delay avoids Chrome cutting off the first syllable */
+        setTimeout(() => window.speechSynthesis.speak(msg), 120);
     }
 
     playVictoryMusic();
