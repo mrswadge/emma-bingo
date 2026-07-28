@@ -202,7 +202,7 @@ function loadSavedState(mode, size) {
         /* Sanity-check: must match current week and size */
         if (obj.weekKey !== getWeekKey() || obj.gridSize !== size) return null;
         return obj;
-    } catch (_) {
+    } catch (err) {
         return null;
     }
 }
@@ -210,7 +210,7 @@ function loadSavedState(mode, size) {
 function persistState(mode, state) {
     try {
         localStorage.setItem(storageKey(mode, state.gridSize), JSON.stringify(state));
-    } catch (_) { /* storage full – silently ignore */ }
+    } catch (err) { /* storage full – silently ignore */ }
 }
 
 function buildFreshState(size, seed) {
