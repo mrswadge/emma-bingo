@@ -29,8 +29,8 @@ When all phrases are crossed off, a full-screen **MilkDrop/Geiss-style** animati
 - **Tap/click anywhere** during the animation to add more Emmas, randomise the colour palette, and increase the chaos (up to 12 taps)
 - At **tap level 3+**, a **kaleidoscope mirror effect** kicks in with increasing symmetry
 - At **tap level 5+**, all Emmas enter **tunnel mode** (flying toward the viewer)
-- Speech synthesis announces "EMMA BINGO! …" at the start (female voice preferred when available)
-- Victory music plays alongside the celebration
+- Speech synthesis delivers a quick sequence of celebration phrases (female voice preferred when available)
+- Victory music is fast-paced trance/dance style with kick, bass, lead and off-beat hats
 
 ### Adding Emma's photo
 
