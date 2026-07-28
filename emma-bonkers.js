@@ -102,6 +102,8 @@ class EmmaBonkersViz {
         for (const c of [this.canvas, this._buf, this._tmp]) {
             c.width = W; c.height = H;
         }
+        /* Cache for kaleidoscope — only changes on resize */
+        this._hypot = Math.hypot(W, H);
     }
 
     /* ── Spawn new Emma particles ─────────────────────────────────────────
@@ -245,6 +247,11 @@ class EmmaBonkersViz {
         const baseSize    = Math.min(W, H) * (0.09 + intensity * 0.10);
         const forceTunnel = this.tapLevel >= 5;
 
+        /* Precompute intensity-driven filter values once for all particles */
+        const bri = (1.1 + intensity * 0.45).toFixed(2);
+        const sat = (1.4 + intensity * 1.6).toFixed(2);
+        const briFallback = (1.2 + intensity * 0.5).toFixed(2);
+
         for (const p of this.particles) {
             /* Burst fade-in */
             if (p.alpha < 1) p.alpha = Math.min(1, p.alpha + dt * 2.8);
@@ -288,15 +295,13 @@ class EmmaBonkersViz {
             ctx.translate(cx, cy);
             ctx.rotate(p.spinAngle);
             ctx.globalAlpha = p.alpha;
-            ctx.filter = `hue-rotate(${p.hue | 0}deg) ` +
-                         `brightness(${(1.1 + intensity * 0.45).toFixed(2)}) ` +
-                         `saturate(${(1.4 + intensity * 1.6).toFixed(2)})`;
 
             if (hasPhoto) {
+                ctx.filter = `hue-rotate(${p.hue | 0}deg) brightness(${bri}) saturate(${sat})`;
                 ctx.drawImage(this.img, -sz / 2, -sz / 2, sz, sz);
             } else {
                 /* Emoji fallback: drawn as coloured circle + 👸 */
-                ctx.filter = `brightness(${(1.2 + intensity * 0.5).toFixed(2)})`;
+                ctx.filter = `brightness(${briFallback})`;
                 ctx.fillStyle = `hsl(${p.hue | 0}, 100%, 60%)`;
                 ctx.beginPath();
                 ctx.arc(0, 0, sz / 2, 0, Math.PI * 2);
@@ -308,9 +313,8 @@ class EmmaBonkersViz {
                 ctx.fillText('👸', 0, 0);
             }
 
-            ctx.restore();
+            ctx.restore();  /* restore() resets filter to 'none' for this save/restore scope */
         }
-        ctx.filter = 'none';
     }
 
     /* ── Kaleidoscope: fold _tmp N-fold around the centre ─────────────────── */
@@ -333,9 +337,8 @@ class EmmaBonkersViz {
             /* Clip to a pie-slice so only one segment shows */
             this.ctx.beginPath();
             this.ctx.moveTo(0, 0);
-            /* Use hypotenuse so the clip covers the entire canvas corner */
-            const far = Math.hypot(W, H);
-            this.ctx.arc(0, 0, far, 0, segAngle);
+            /* Use cached hypotenuse so the clip covers the entire canvas corner */
+            this.ctx.arc(0, 0, this._hypot, 0, segAngle);
             this.ctx.closePath();
             this.ctx.clip();
 
