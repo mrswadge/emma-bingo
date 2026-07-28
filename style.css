@@ -358,10 +358,20 @@ body {
     background: rgba(20, 0, 32, 0.78);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
+    transition: background 0.4s ease, backdrop-filter 0.4s ease;
 }
 
 .victory-overlay.hidden {
     display: none;
+}
+
+/* During the Emma Bonkers animation the canvas fills the screen.
+   Remove the dim overlay and blur so the full canvas shows through. */
+.victory-overlay.viz-active {
+    background: #000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    cursor: pointer;
 }
 
 #confetti-canvas {
@@ -370,6 +380,17 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
+    display: block;
+}
+
+/* Victory panel hidden while animation plays */
+.victory-box.box-hidden {
+    display: none;
+}
+
+/* Entrance animation when the victory panel is revealed after the viz */
+.victory-box.box-revealed {
+    animation: victoryAppear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .victory-box {

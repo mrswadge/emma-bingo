@@ -341,7 +341,13 @@ function triggerVictory() {
     document.getElementById('victory-phrase').textContent = phrase;
 
     const overlay = document.getElementById('victory-overlay');
+    const box     = document.getElementById('victory-box');
+
+    /* Show overlay in viz-active mode: black background, canvas fills screen */
     overlay.classList.remove('hidden');
+    overlay.classList.add('viz-active');
+    box.classList.add('box-hidden');
+    box.classList.remove('box-revealed');
 
     /* Speech synthesis */
     if ('speechSynthesis' in window) {
@@ -355,114 +361,27 @@ function triggerVictory() {
         setTimeout(() => window.speechSynthesis.speak(msg), 120);
     }
 
-    /* Confetti */
+    /* Start the EmmaBonkersViz animation */
     const canvas = document.getElementById('confetti-canvas');
-    confettiAnim = new Confetti(canvas);
+    const imgEl  = document.getElementById('emma-img');
+    confettiAnim = new EmmaBonkersViz(canvas, imgEl);
+    confettiAnim.onComplete = () => {
+        /* After 60 s: hide viz-active, reveal the victory panel */
+        overlay.classList.remove('viz-active');
+        box.classList.remove('box-hidden');
+        box.classList.add('box-revealed');
+    };
     confettiAnim.start();
 }
 
 function closeVictory() {
-    document.getElementById('victory-overlay').classList.add('hidden');
+    const overlay = document.getElementById('victory-overlay');
+    const box     = document.getElementById('victory-box');
+    overlay.classList.add('hidden');
+    overlay.classList.remove('viz-active');
+    box.classList.remove('box-hidden', 'box-revealed');
     if (confettiAnim) { confettiAnim.stop(); confettiAnim = null; }
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-}
-
-/* ── Confetti ────────────────────────────────────────────────────────────────
-   Canvas-based confetti animation. Particles are rectangles and circles in
-   bright colours that fall from the top and fade out near the bottom.
-   ──────────────────────────────────────────────────────────────────────────── */
-class Confetti {
-    constructor(canvas) {
-        this.canvas    = canvas;
-        this.ctx       = canvas.getContext('2d');
-        this.running   = false;
-        this.raf       = null;
-        this.particles = [];
-        this.COLORS    = [
-            '#e91e8c', '#9c27b0', '#ff9800', '#4caf50',
-            '#2196f3', '#ffeb3b', '#f44336', '#00bcd4', '#ff5722'
-        ];
-        this._onResize = () => this._resize();
-    }
-
-    _resize() {
-        this.canvas.width  = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-    }
-
-    _spawn() {
-        const sz = 5 + Math.random() * 11;
-        return {
-            x:     Math.random() * this.canvas.width,
-            y:     -(sz * 2),
-            w:     sz,
-            h:     sz * (0.25 + Math.random() * 0.65),
-            angle: Math.random() * Math.PI * 2,
-            spin:  (Math.random() - 0.5) * 0.28,
-            vx:    (Math.random() - 0.5) * 5,
-            vy:    2 + Math.random() * 4.5,
-            color: this.COLORS[Math.floor(Math.random() * this.COLORS.length)],
-            alpha: 1,
-            shape: Math.random() > 0.45 ? 'rect' : 'circle'
-        };
-    }
-
-    _tick() {
-        const { ctx, canvas } = this;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        /* Keep spawning while running and below cap */
-        if (this.running && this.particles.length < 380) {
-            for (let n = 0; n < 12; n++) this.particles.push(this._spawn());
-        }
-
-        /* Remove off-screen or fully transparent particles */
-        this.particles = this.particles.filter(
-            p => p.y < canvas.height + 20 && p.alpha > 0.01
-        );
-
-        for (const p of this.particles) {
-            p.x     += p.vx;
-            p.y     += p.vy;
-            p.angle += p.spin;
-            p.vx    *= 0.992;          /* gentle air resistance */
-            if (p.y > canvas.height * 0.6) p.alpha -= 0.02;
-
-            ctx.save();
-            ctx.globalAlpha = p.alpha;
-            ctx.fillStyle   = p.color;
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.angle);
-            if (p.shape === 'circle') {
-                ctx.beginPath();
-                ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
-                ctx.fill();
-            } else {
-                ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-            }
-            ctx.restore();
-        }
-
-        if (this.running || this.particles.length > 0) {
-            this.raf = requestAnimationFrame(() => this._tick());
-        } else {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-    }
-
-    start() {
-        this._resize();
-        window.addEventListener('resize', this._onResize);
-        this.running   = true;
-        this.particles = [];
-        this._tick();
-    }
-
-    stop() {
-        this.running = false;
-        window.removeEventListener('resize', this._onResize);
-        if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null; }
-    }
 }
 
 /* ── Board Initialisation ────────────────────────────────────────────────────
@@ -535,8 +454,16 @@ document.addEventListener('DOMContentLoaded', () => {
     /* Close victory overlay */
     document.getElementById('btn-close-victory').addEventListener('click', closeVictory);
 
-    /* Clicking the dark backdrop also closes it */
+    /* During animation: tap anywhere on the overlay to increase chaos.
+       After animation: clicking the dark backdrop closes the overlay.       */
     document.getElementById('victory-overlay').addEventListener('click', (e) => {
+        if (confettiAnim && confettiAnim.running) {
+            /* Don't count clicks on the close button as "more chaos" taps */
+            if (!e.target.closest('#btn-close-victory')) {
+                confettiAnim.onTap();
+            }
+            return;
+        }
         if (e.target === e.currentTarget) closeVictory();
     });
 

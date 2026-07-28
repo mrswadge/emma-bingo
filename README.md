@@ -18,13 +18,29 @@ A fun, fully client-side bingo game built for GitHub Pages.
 | 🔄 **Reset** | Clear all crosses on the current board |
 | **Board size** | Choose 3×3, 4×4, 5×5 (default), 6×6 or 7×7 |
 
-## Features
+## Victory animation
 
-- **Weekly rotation** – boards change automatically every Monday; no server needed.
-- **Persistent state** – crosses are remembered in `localStorage` so you can close the tab and come back.
-- **Odd-sized grids** (3×3, 5×5, 7×7) have an Emma Bingo logo in the centre as a free space.
-- **Victory screen** – full-screen confetti animation + speech synthesis ("EMMA BINGO! …").
-- **Keyboard accessible** – cells can be toggled with `Enter` or `Space`.
+When all phrases are crossed off, a full-screen **MilkDrop/Geiss-style** animation fires:
+
+- **Zoom-warp feedback loop** — the screen zooms into itself creating a psychedelic tunnel
+- **Plasma colour blobs** — screen-blended animated gradients paint shifting rainbow backgrounds
+- **Emma particles** — Emma's photo orbits, spirals, wobbles and tunnels across the screen in various styles with spinning and colour-cycling
+- **Auto-stops after 60 seconds**, then the victory panel fades in
+- **Tap/click anywhere** during the animation to add more Emmas and increase the chaos (up to 12 taps)
+- At **tap level 3+**, a **kaleidoscope mirror effect** kicks in with increasing symmetry
+- At **tap level 5+**, all Emmas enter **tunnel mode** (flying toward the viewer)
+- Speech synthesis announces "EMMA BINGO! …" at the start
+
+### Adding Emma's photo
+
+The animation uses `emma.jpg` in the repository root. Add the photo to unlock the full effect:
+
+1. Save your Emma photo as `emma.jpg` (any size — square works best)
+2. Commit it to the repository root
+3. The animation will automatically use it
+
+Without `emma.jpg` the animation still runs — each particle slot shows a 👸 emoji avatar instead.
+
 
 ## Deploying to GitHub Pages
 

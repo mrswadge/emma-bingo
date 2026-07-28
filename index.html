@@ -48,10 +48,17 @@
 
     <p class="hint">Tap a phrase to cross it off — tap again to undo</p>
 
+    <!-- Hidden Emma image loaded once; used by the EmmaBonkersViz animation.
+         Add emma.jpg to the repository root to enable the photo effect. -->
+    <img id="emma-img" src="emma.jpg" alt="" aria-hidden="true"
+         style="display:none" crossorigin="anonymous">
+
     <!-- Victory Overlay -->
     <div id="victory-overlay" class="victory-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="victory-heading">
+        <!-- Full-screen canvas for the Emma Bonkers animation -->
         <canvas id="confetti-canvas" aria-hidden="true"></canvas>
-        <div class="victory-box">
+        <!-- Victory panel — hidden during animation, shown after 60 s -->
+        <div class="victory-box" id="victory-box">
             <div class="victory-emoji" aria-hidden="true">🎊</div>
             <h2 id="victory-heading" class="victory-heading">EMMA BINGO!</h2>
             <p id="victory-phrase" class="victory-phrase"></p>
@@ -59,6 +66,7 @@
         </div>
     </div>
 
+    <script src="emma-bonkers.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
