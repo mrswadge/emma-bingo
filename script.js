@@ -121,6 +121,13 @@ const EMMA_EXCLAMATIONS = [
     "You scared meeee!! He-yyyy!"
 ];
 
+const FEMALE_VOICE_HINTS = /(female|woman|samantha|victoria|karen|zira|hazel|susan|serena|aria|libby|sonia|ava|allison|joanna|amy|emma|olivia|salli|raveena|moira|kendra|google uk english female)/i;
+const VICTORY_MUSIC_BPM = 98;
+/* D4, E4, G4, A4, G4, E4, D4, C4 */
+const VICTORY_MELODY_NOTES = [62, 64, 67, 69, 67, 64, 62, 60];
+/* D2, D2, F2, F2, C2, C2, A1, A1 */
+const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
+
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
    ──────────────────────────────────────────────────────────────────────────── */
@@ -254,10 +261,9 @@ function getFemaleVoice() {
     const voices = window.speechSynthesis.getVoices();
     if (!voices.length) return null;
 
-    const femaleHints = /(female|woman|samantha|victoria|karen|zira|hazel|susan|serena|aria|libby|sonia|ava|allison|joanna|amy|emma|olivia|salli|raveena|moira|kendra|google uk english female)/i;
     const englishVoices = voices.filter(v => /^en(-|$)/i.test(v.lang));
     const preferred = englishVoices.length ? englishVoices : voices;
-    return preferred.find(v => femaleHints.test(v.name)) || preferred[0] || null;
+    return preferred.find(v => FEMALE_VOICE_HINTS.test(v.name)) || preferred[0] || null;
 }
 
 function ensureWinAudioContext() {
@@ -295,10 +301,8 @@ function playVictoryMusic() {
     stopVictoryMusic();
 
     const now = ctx.currentTime + 0.03;
-    const beat = 60 / 98;
+    const beat = 60 / VICTORY_MUSIC_BPM;
     const loops = 4;
-    const melody = [62, 64, 67, 69, 67, 64, 62, 60];
-    const bass = [38, 38, 41, 41, 36, 36, 33, 33];
 
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, now);
@@ -307,15 +311,16 @@ function playVictoryMusic() {
     winAudioNodes.push(master);
 
     for (let loop = 0; loop < loops; loop++) {
-        const loopStart = now + loop * melody.length * beat;
-        for (let i = 0; i < melody.length; i++) {
+        const loopStart = now + loop * VICTORY_MELODY_NOTES.length * beat;
+        for (let i = 0; i < VICTORY_MELODY_NOTES.length; i++) {
             const t0 = loopStart + i * beat;
             const t1 = t0 + beat * 0.95;
 
             const lead = ctx.createOscillator();
             const leadGain = ctx.createGain();
+            /* Alternate waveforms for a brighter pop lead line */
             lead.type = i % 2 ? 'triangle' : 'sawtooth';
-            lead.frequency.setValueAtTime(midiToFreq(melody[i]), t0);
+            lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[i]), t0);
             leadGain.gain.setValueAtTime(0, t0);
             leadGain.gain.linearRampToValueAtTime(0.11, t0 + 0.02);
             leadGain.gain.exponentialRampToValueAtTime(0.0001, t1);
@@ -328,7 +333,7 @@ function playVictoryMusic() {
             const low = ctx.createOscillator();
             const lowGain = ctx.createGain();
             low.type = 'square';
-            low.frequency.setValueAtTime(midiToFreq(bass[i]), t0);
+            low.frequency.setValueAtTime(midiToFreq(VICTORY_BASS_NOTES[i]), t0);
             lowGain.gain.setValueAtTime(0, t0);
             lowGain.gain.linearRampToValueAtTime(0.08, t0 + 0.015);
             lowGain.gain.exponentialRampToValueAtTime(0.0001, t0 + beat * 0.8);
@@ -340,7 +345,7 @@ function playVictoryMusic() {
         }
     }
 
-    const totalDurationMs = (loops * melody.length * beat + 0.6) * 1000;
+    const totalDurationMs = (loops * VICTORY_MELODY_NOTES.length * beat + 0.6) * 1000;
     winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
 }
 

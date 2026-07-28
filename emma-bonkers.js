@@ -38,6 +38,7 @@ class EmmaBonkersViz {
     static BASE_EMMAS    = 4;
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS     = 52;
+    static KALEIDOSCOPE_OVERSCAN = 1.14;
 
     constructor(canvas, imgEl) {
         this.canvas     = canvas;
@@ -346,7 +347,7 @@ class EmmaBonkersViz {
             /* Clip to a pie-slice so only one segment shows */
             this.ctx.beginPath();
             this.ctx.moveTo(0, 0);
-            /* Use cached hypotenuse so the clip covers the entire canvas corner */
+            /* Slightly over-extend radius and angles to hide visible slice seams */
             this.ctx.arc(0, 0, this._hypot + 4, -0.012, segAngle + 0.012);
             this.ctx.closePath();
             this.ctx.clip();
@@ -354,7 +355,7 @@ class EmmaBonkersViz {
             /* Flip every other slice to create true mirror symmetry */
             if (i % 2 === 1) this.ctx.scale(-1, 1);
 
-            const over = 1.14;
+            const over = EmmaBonkersViz.KALEIDOSCOPE_OVERSCAN;
             this.ctx.drawImage(this._tmp, -W * over / 2, -H * over / 2, W * over, H * over);
             this.ctx.restore();
         }
