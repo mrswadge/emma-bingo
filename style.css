@@ -1,0 +1,466 @@
+/* ── Design Tokens ──────────────────────────────────────────────── */
+:root {
+    --pink:         #e91e8c;
+    --pink-light:   #fce4ec;
+    --pink-mid:     #f8bbd0;
+    --pink-dark:    #c2185b;
+    --purple:       #7b1fa2;
+    --purple-dark:  #4a148c;
+    --white:        #ffffff;
+    --bg-grad-a:    #fce4ec;
+    --bg-grad-b:    #f3e5f5;
+    --text:         #2d1b35;
+    --radius:       10px;
+    --gap:          5px;
+    --cell-font:    9px;   /* overridden by JS per grid size */
+}
+
+/* ── Reset & Base ───────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(160deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px 40px;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.site-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.site-title {
+    font-size: clamp(1.6rem, 7vw, 2.8rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+}
+
+.week-info {
+    font-size: 0.75rem;
+    color: var(--purple);
+    font-weight: 700;
+    margin-top: 3px;
+    opacity: 0.75;
+}
+
+/* ── Controls ───────────────────────────────────────────────────── */
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    width: 100%;
+    max-width: 700px;
+}
+
+.controls-left, .controls-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.control-label {
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: var(--purple);
+}
+
+.select {
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--purple);
+    background: var(--white);
+    border: 2px solid var(--pink);
+    border-radius: 8px;
+    padding: 5px 28px 5px 10px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23e91e8c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    transition: border-color 0.15s;
+}
+
+.select:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(123,31,162,0.15);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+.btn {
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.btn:active {
+    transform: scale(0.93);
+}
+
+.btn-mode {
+    background: var(--white);
+    color: var(--pink);
+    border: 2px solid var(--pink);
+}
+
+.btn-mode:hover {
+    background: var(--pink-light);
+}
+
+.btn-mode.active {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: var(--white);
+    border-color: transparent;
+    box-shadow: 0 3px 12px rgba(233,30,140,0.4);
+}
+
+.btn-reset {
+    background: var(--white);
+    color: #999;
+    border: 2px solid #ddd;
+}
+
+.btn-reset:hover {
+    border-color: var(--pink);
+    color: var(--pink-dark);
+}
+
+.btn-victory {
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    color: var(--white);
+    font-size: 1rem;
+    padding: 12px 30px;
+    border-radius: 25px;
+    box-shadow: 0 4px 20px rgba(233,30,140,0.5);
+    margin-top: 14px;
+    border: none;
+}
+
+.btn-victory:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 28px rgba(233,30,140,0.65);
+}
+
+/* ── Progress Bar ───────────────────────────────────────────────── */
+.progress-bar-wrap {
+    width: 100%;
+    max-width: 700px;
+    padding: 0 4px;
+    margin-bottom: 8px;
+}
+
+.progress-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--purple);
+    text-align: right;
+    margin-bottom: 3px;
+    opacity: 0.8;
+}
+
+.progress-track {
+    height: 6px;
+    background: rgba(233,30,140,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* ── Grid Container ─────────────────────────────────────────────── */
+.grid-container {
+    width: 100%;
+    max-width: min(96vw, 700px);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.bingo-grid {
+    display: grid;
+    gap: var(--gap);
+    width: 100%;
+}
+
+/* ── Bingo Cells ────────────────────────────────────────────────── */
+.bingo-cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: var(--white);
+    border: 2px solid var(--pink);
+    border-radius: var(--radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3px;
+    overflow: hidden;
+    font-size: var(--cell-font);
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    transition: background-color 0.15s ease, color 0.15s ease,
+                transform 0.1s ease, border-color 0.15s ease,
+                box-shadow 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    color: var(--text);
+    box-shadow: 0 2px 6px rgba(233,30,140,0.07);
+}
+
+.bingo-cell:hover:not(.center-cell) {
+    background: #fff5fb;
+    border-color: var(--purple);
+    transform: scale(1.04);
+    z-index: 1;
+    box-shadow: 0 4px 14px rgba(233,30,140,0.22);
+}
+
+.bingo-cell:active:not(.center-cell) {
+    transform: scale(0.95);
+}
+
+.bingo-cell:focus-visible {
+    outline: 3px solid var(--purple);
+    outline-offset: 2px;
+    z-index: 2;
+}
+
+/* ── Crossed State ──────────────────────────────────────────────── */
+.bingo-cell.crossed {
+    background: linear-gradient(135deg, var(--pink-light) 0%, var(--pink-mid) 100%);
+    border-color: var(--pink-dark);
+    color: var(--pink-dark);
+    text-decoration: line-through;
+    text-decoration-color: var(--pink);
+    text-decoration-thickness: 2px;
+}
+
+.bingo-cell.crossed::after {
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2em;
+    color: var(--pink);
+    opacity: 0.18;
+    font-weight: 900;
+    pointer-events: none;
+}
+
+/* ── Centre / Logo Cell ─────────────────────────────────────────── */
+.bingo-cell.center-cell {
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+    border-color: var(--purple-dark);
+    cursor: default;
+    color: var(--white);
+    padding: 4px;
+    box-shadow: 0 4px 18px rgba(123,31,162,0.45);
+}
+
+.bingo-cell.center-cell:hover {
+    transform: none;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 100%);
+    border-color: var(--purple-dark);
+    box-shadow: 0 4px 18px rgba(123,31,162,0.45);
+}
+
+.center-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    line-height: 1.1;
+    width: 100%;
+    height: 100%;
+}
+
+.logo-icon {
+    font-size: 1.9em;
+    line-height: 1;
+    animation: logoPulse 2.5s ease-in-out infinite;
+    display: block;
+}
+
+.logo-text {
+    font-weight: 900;
+    font-size: 0.88em;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.1;
+}
+
+@keyframes logoPulse {
+    0%, 100% { transform: scale(1)    rotate(0deg);   }
+    25%       { transform: scale(1.1)  rotate(-3deg);  }
+    75%       { transform: scale(1.08) rotate(3deg);   }
+}
+
+/* ── Hint ───────────────────────────────────────────────────────── */
+.hint {
+    font-size: 0.7rem;
+    color: var(--purple);
+    opacity: 0.6;
+    margin-top: 8px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* ── Victory Overlay ────────────────────────────────────────────── */
+.victory-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(20, 0, 32, 0.78);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.victory-overlay.hidden {
+    display: none;
+}
+
+/* During the Emma Bonkers animation the canvas fills the screen.
+   Remove the dim overlay and blur so the full canvas shows through. */
+.victory-overlay.viz-active {
+    background: #000;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    cursor: pointer;
+}
+
+#confetti-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+}
+
+/* Victory panel hidden while animation plays */
+.victory-box.box-hidden {
+    display: none;
+}
+
+/* Entrance animation when the victory panel is revealed after the viz */
+.victory-box.box-revealed {
+    animation: victoryAppear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.victory-box {
+    position: relative;
+    z-index: 1;
+    background: var(--white);
+    border-radius: 24px;
+    padding: 40px 32px 32px;
+    text-align: center;
+    max-width: min(92vw, 480px);
+    width: 100%;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+    animation: victoryAppear 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes victoryAppear {
+    from { transform: scale(0.35) rotate(-8deg); opacity: 0; }
+    to   { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+
+.victory-emoji {
+    font-size: 4rem;
+    line-height: 1;
+    margin-bottom: 10px;
+    display: block;
+    animation: victoryBounce 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes victoryBounce {
+    from { transform: translateY(0);    }
+    to   { transform: translateY(-10px); }
+}
+
+.victory-heading {
+    font-size: clamp(2.2rem, 9vw, 3.6rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 14px;
+    animation: victoryGlow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes victoryGlow {
+    from { filter: drop-shadow(0 0 6px  rgba(233,30,140,0.3)); }
+    to   { filter: drop-shadow(0 0 22px rgba(123,31,162,0.7)); }
+}
+
+.victory-phrase {
+    font-size: clamp(0.95rem, 3.5vw, 1.35rem);
+    font-weight: 800;
+    color: var(--purple);
+    background: var(--pink-light);
+    border-radius: 14px;
+    padding: 12px 18px;
+    min-height: 2.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Responsive tweaks ──────────────────────────────────────────── */
+@media (max-width: 420px) {
+    .controls-bar {
+        flex-direction: column;
+    }
+    .victory-box {
+        padding: 28px 18px 22px;
+    }
+}
