@@ -121,6 +121,21 @@ const EMMA_EXCLAMATIONS = [
     "You scared meeee!! He-yyyy!"
 ];
 
+/* Common female voice labels seen across major browser/platform voice packs. */
+const FEMALE_VOICE_NAMES = [
+    'female', 'woman', 'samantha', 'victoria', 'karen', 'zira', 'hazel', 'susan',
+    'serena', 'aria', 'Libby', 'sonia', 'ava', 'allison', 'joanna', 'amy', 'emma',
+    'olivia', 'salli', 'raveena', 'moira', 'kendra', 'google uk english female'
+];
+const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
+const MIN_BOARD_SIZE = 3;
+const MAX_BOARD_SIZE = 7;
+const VICTORY_MUSIC_BPM = 98;
+/* Melody MIDI notes: 62,64,67,69,67,64,62,60 */
+const VICTORY_MELODY_NOTES = [62, 64, 67, 69, 67, 64, 62, 60];
+/* Bass MIDI notes: 38,38,41,41,36,36,33,33 */
+const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
+
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
    ──────────────────────────────────────────────────────────────────────────── */
@@ -134,18 +149,9 @@ function mulberry32(seed) {
     };
 }
 
-/* FNV-1a 32-bit string hash – used to convert the week key string to a seed */
-function hashStr(str) {
-    let h = 2166136261 >>> 0;
-    for (let i = 0; i < str.length; i++) {
-        h = Math.imul(h ^ str.charCodeAt(i), 16777619) >>> 0;
-    }
-    return h;
-}
-
 /* ── Week Key ────────────────────────────────────────────────────────────────
    Returns "YYYY-MM-DD" for the Monday of the current week (weeks run Mon-Sun).
-   All players in the same Mon-Sun window receive the same weekly board.
+   Weekly progress is keyed to this value so boards roll over each week.
    ──────────────────────────────────────────────────────────────────────────── */
 function getWeekKey() {
     const now = new Date();
@@ -223,6 +229,29 @@ function buildFreshState(size, seed) {
     };
 }
 
+function parseUrlState() {
+    const params = new URLSearchParams(window.location.search);
+    const modeParam = params.get('mode');
+    const sizeParam = parseInt(params.get('size'), 10);
+    const seedParam = params.get('seed');
+    const seedNum = seedParam === null ? null : Number(seedParam);
+
+    return {
+        mode: modeParam === 'custom' || modeParam === 'weekly' ? modeParam : null,
+        size: Number.isInteger(sizeParam) && sizeParam >= MIN_BOARD_SIZE && sizeParam <= MAX_BOARD_SIZE ? sizeParam : null,
+        seed: Number.isInteger(seedNum) && seedNum >= 0 && seedNum <= 0xFFFFFFFF ? (seedNum >>> 0) : null
+    };
+}
+
+function persistUrlState(mode, size, seed, push) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', mode);
+    url.searchParams.set('size', String(size));
+    url.searchParams.set('seed', String(seed >>> 0));
+    const method = push ? 'pushState' : 'replaceState';
+    window.history[method]({}, '', url);
+}
+
 /* ── App State ───────────────────────────────────────────────────────────────
    gameState  – current board words, crosses and metadata
    boardMode  – 'weekly' | 'custom'
@@ -231,6 +260,102 @@ function buildFreshState(size, seed) {
 let gameState    = null;
 let boardMode    = 'weekly';
 let victoryViz = null;
+let winAudioCtx  = null;
+let winAudioNodes = [];
+let winAudioStopTimer = null;
+
+function getFemaleVoice() {
+    if (!('speechSynthesis' in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return null;
+
+    const englishVoices = voices.filter(v => /^en(-|$)/i.test(v.lang));
+    const preferred = englishVoices.length ? englishVoices : voices;
+    return preferred.find(v => FEMALE_VOICE_HINTS.test(v.name)) || preferred[0] || null;
+}
+
+function ensureWinAudioContext() {
+    if (!window.AudioContext && !window.webkitAudioContext) return null;
+    if (!winAudioCtx) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        winAudioCtx = new Ctx();
+    }
+    if (winAudioCtx.state === 'suspended') {
+        winAudioCtx.resume().catch(() => {});
+    }
+    return winAudioCtx;
+}
+
+function stopVictoryMusic() {
+    if (winAudioStopTimer) {
+        clearTimeout(winAudioStopTimer);
+        winAudioStopTimer = null;
+    }
+    for (const node of winAudioNodes) {
+        try { node.stop(); } catch (_) {}
+        try { node.disconnect(); } catch (_) {}
+    }
+    winAudioNodes = [];
+}
+
+function midiToFreq(note) {
+    return 440 * Math.pow(2, (note - 69) / 12);
+}
+
+function playVictoryMusic() {
+    const ctx = ensureWinAudioContext();
+    if (!ctx) return;
+
+    stopVictoryMusic();
+
+    const now = ctx.currentTime + 0.03;
+    const beat = 60 / VICTORY_MUSIC_BPM;
+    const loops = 4;
+
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.linearRampToValueAtTime(0.18, now + 0.3);
+    master.connect(ctx.destination);
+    winAudioNodes.push(master);
+
+    for (let loop = 0; loop < loops; loop++) {
+        const loopStart = now + loop * VICTORY_MELODY_NOTES.length * beat;
+        for (let i = 0; i < VICTORY_MELODY_NOTES.length; i++) {
+            const t0 = loopStart + i * beat;
+            const t1 = t0 + beat * 0.95;
+
+            const lead = ctx.createOscillator();
+            const leadGain = ctx.createGain();
+            /* Triangle on odd indices, sawtooth on even indices for alternating tone color. */
+            lead.type = i % 2 ? 'triangle' : 'sawtooth';
+            lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[i]), t0);
+            leadGain.gain.setValueAtTime(0, t0);
+            leadGain.gain.linearRampToValueAtTime(0.11, t0 + 0.02);
+            leadGain.gain.exponentialRampToValueAtTime(0.0001, t1);
+            lead.connect(leadGain);
+            leadGain.connect(master);
+            lead.start(t0);
+            lead.stop(t1 + 0.01);
+            winAudioNodes.push(lead, leadGain);
+
+            const low = ctx.createOscillator();
+            const lowGain = ctx.createGain();
+            low.type = 'square';
+            low.frequency.setValueAtTime(midiToFreq(VICTORY_BASS_NOTES[i]), t0);
+            lowGain.gain.setValueAtTime(0, t0);
+            lowGain.gain.linearRampToValueAtTime(0.08, t0 + 0.015);
+            lowGain.gain.exponentialRampToValueAtTime(0.0001, t0 + beat * 0.8);
+            low.connect(lowGain);
+            lowGain.connect(master);
+            low.start(t0);
+            low.stop(t0 + beat * 0.82);
+            winAudioNodes.push(low, lowGain);
+        }
+    }
+
+    const totalDurationMs = (loops * VICTORY_MELODY_NOTES.length * beat + 0.6) * 1000;
+    winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
+}
 
 /* ── Font Sizes ──────────────────────────────────────────────────────────────
    Approximate cell text size for each grid dimension, injected as a CSS
@@ -354,14 +479,20 @@ function triggerVictory() {
     /* Speech synthesis */
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const msg  = new SpeechSynthesisUtterance(`EMMA BINGO! ${phrase}`);
-        msg.lang   = 'en-GB';
-        msg.rate   = 0.78;
-        msg.pitch  = 1.3;
-        msg.volume = 1;
-        /* Small delay avoids Chrome cutting off the first syllable */
-        setTimeout(() => window.speechSynthesis.speak(msg), 120);
+        const femaleVoice = getFemaleVoice();
+        if (femaleVoice) {
+            const msg  = new SpeechSynthesisUtterance(`EMMA BINGO! ${phrase}`);
+            msg.lang   = femaleVoice.lang || 'en-GB';
+            msg.rate   = 0.78;
+            msg.pitch  = 1.3;
+            msg.volume = 1;
+            msg.voice  = femaleVoice;
+            /* Small delay avoids Chrome cutting off the first syllable */
+            setTimeout(() => window.speechSynthesis.speak(msg), 120);
+        }
     }
+
+    playVictoryMusic();
 
     /* Start the EmmaBonkersViz animation */
     const canvas = document.getElementById('confetti-canvas');
@@ -384,30 +515,36 @@ function closeVictory() {
     box.classList.remove('box-hidden', 'box-revealed');
     if (victoryViz) { victoryViz.stop(); victoryViz = null; }
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    stopVictoryMusic();
 }
 
 /* ── Board Initialisation ────────────────────────────────────────────────────
    Loads saved state for the requested mode/size, or creates a fresh one.
    ──────────────────────────────────────────────────────────────────────────── */
-function initBoard(size, mode, overrideSeed) {
+function initBoard(size, mode, overrideSeed, pushHistory) {
     boardMode = mode;
 
-    if (overrideSeed !== undefined) {
-        /* Always start fresh when an explicit seed is supplied (Shuffle button) */
-        gameState = buildFreshState(size, overrideSeed);
-        persistState(mode, gameState);
+    if (overrideSeed !== undefined && overrideSeed !== null) {
+        /* If URL/user provides a seed, restore matching board or create it */
+        const saved = loadSavedState(mode, size);
+        if (saved && (saved.seed >>> 0) === (overrideSeed >>> 0)) {
+            gameState = saved;
+        } else {
+            gameState = buildFreshState(size, overrideSeed >>> 0);
+            persistState(mode, gameState);
+        }
     } else {
         const saved = loadSavedState(mode, size);
         if (saved) {
             gameState = saved;
         } else {
-            const seed = mode === 'weekly'
-                ? hashStr(`${getWeekKey()}-${size}`)           /* deterministic weekly seed */
-                : (Math.random() * 0xFFFFFFFF) >>> 0;          /* random custom seed */
+            const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
             gameState = buildFreshState(size, seed);
             persistState(mode, gameState);
         }
     }
+
+    persistUrlState(mode, size, gameState.seed, !!pushHistory);
 
     /* Sync mode-button active state */
     document.querySelectorAll('.btn-mode').forEach(btn => {
@@ -423,17 +560,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('week-label').textContent = getWeekKey();
 
     const gridSel = document.getElementById('grid-size');
+    const urlState = parseUrlState();
+    if (urlState.size) gridSel.value = String(urlState.size);
+    if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+        /* Prime voice loading early so female voice selection is ready on win. */
+        window.speechSynthesis.getVoices();
+        window.speechSynthesis.addEventListener('voiceschanged', () => getFemaleVoice(), { once: true });
+    }
+
+    document.addEventListener('pointerdown', () => { ensureWinAudioContext(); }, { once: true });
 
     /* Grid size selector */
     gridSel.addEventListener('change', () => {
         closeVictory();
-        initBoard(parseInt(gridSel.value, 10), boardMode);
+        initBoard(parseInt(gridSel.value, 10), boardMode, undefined, true);
     });
 
     /* Weekly board */
     document.getElementById('btn-weekly').addEventListener('click', () => {
         closeVictory();
-        initBoard(parseInt(gridSel.value, 10), 'weekly');
+        initBoard(parseInt(gridSel.value, 10), 'weekly', undefined, true);
     });
 
     /* Shuffle – always generate a brand-new random board */
@@ -441,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeVictory();
         const size = parseInt(gridSel.value, 10);
         const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
-        initBoard(size, 'custom', seed);
+        initBoard(size, 'custom', seed, true);
     });
 
     /* Reset crosses on current board */
@@ -470,5 +616,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* Boot */
-    initBoard(parseInt(gridSel.value, 10), 'weekly');
+    initBoard(
+        parseInt(gridSel.value, 10),
+        urlState.mode || 'weekly',
+        urlState.seed,
+        false
+    );
 });
