@@ -270,9 +270,9 @@ function getFemaleVoice() {
     if (!voices.length) return null;
 
     const englishVoices = voices.filter(v => /^en(-|$)/i.test(v.lang));
-    const pool = englishVoices.length ? englishVoices : [];
+    const englishVoicePool = englishVoices.length ? englishVoices : [];
     /* Prefer a named female English voice; fall back to any English voice */
-    return pool.find(v => FEMALE_VOICE_HINTS.test(v.name)) || pool[0] || null;
+    return englishVoicePool.find(v => FEMALE_VOICE_HINTS.test(v.name)) || englishVoicePool[0] || null;
 }
 
 function ensureWinAudioContext() {

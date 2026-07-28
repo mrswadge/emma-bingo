@@ -117,8 +117,8 @@ class EmmaBonkersViz {
         /* Cache for kaleidoscope — only changes on resize.
            Overscan must be at least hypot/min(W,H) so every canvas corner is
            covered by the source image in every slice, regardless of aspect ratio. */
-        this._hypot    = Math.hypot(W, H);
-        this._kaleOver = this._hypot / Math.min(W, H);
+        this._hypot               = Math.hypot(W, H);
+        this._kaleidoscopeOverscan = this._hypot / Math.min(W, H);
     }
 
     /* ── Spawn new Emma particles ─────────────────────────────────────────
@@ -363,7 +363,7 @@ class EmmaBonkersViz {
             /* Flip every other slice to create true mirror symmetry */
             if (i % 2 === 1) this.ctx.scale(-1, 1);
 
-            const over = this._kaleOver;
+            const over = this._kaleidoscopeOverscan;
             this.ctx.drawImage(this._tmp, -W * over / 2, -H * over / 2, W * over, H * over);
             this.ctx.restore();
         }
