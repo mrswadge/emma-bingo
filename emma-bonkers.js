@@ -32,6 +32,7 @@
  * ──────────────────────────────────────────────────────────────────────────
  */
 class EmmaBonkersViz {
+    /** Total animation duration in milliseconds (60 s = one satisfying bingo celebration). */
     static DURATION_MS   = 60_000;
     static MAX_TAPS      = 12;
     static BASE_EMMAS    = 4;
@@ -313,7 +314,7 @@ class EmmaBonkersViz {
                 ctx.fillText('👸', 0, 0);
             }
 
-            ctx.restore();  /* restore() resets filter to 'none' for this save/restore scope */
+            ctx.restore();  /* resets filter, transform & alpha for this particle */
         }
     }
 

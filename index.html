@@ -49,9 +49,11 @@
     <p class="hint">Tap a phrase to cross it off — tap again to undo</p>
 
     <!-- Hidden Emma image loaded once; used by the EmmaBonkersViz animation.
-         Add emma.jpg to the repository root to enable the photo effect. -->
+         Add emma.jpg to the repository root to enable the full photo effect.
+         If the image is absent, the animation uses an emoji 👸 avatar fallback. -->
     <img id="emma-img" src="emma.jpg" aria-hidden="true"
-         style="display:none" crossorigin="anonymous">
+         style="display:none" crossorigin="anonymous"
+         onerror="this.removeAttribute('src')">
 
     <!-- Victory Overlay -->
     <div id="victory-overlay" class="victory-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="victory-heading">

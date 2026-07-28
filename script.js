@@ -226,15 +226,17 @@ function buildFreshState(size, seed) {
 /* ── App State ───────────────────────────────────────────────────────────────
    gameState  – current board words, crosses and metadata
    boardMode  – 'weekly' | 'custom'
-   confettiAnim – Confetti instance while victory overlay is open
+   victoryViz – EmmaBonkersViz instance while victory overlay is open
    ──────────────────────────────────────────────────────────────────────────── */
 let gameState    = null;
 let boardMode    = 'weekly';
-let confettiAnim = null;
+let victoryViz = null;
 
 /* ── Font Sizes ──────────────────────────────────────────────────────────────
    Approximate cell text size for each grid dimension, injected as a CSS
    custom property so CSS can reference it without JS repetition.
+   Supported sizes: 3×3 to 7×7 (matching the grid-size selector options).
+   The '9px' fallback in renderGrid covers any unexpected grid size.
    ──────────────────────────────────────────────────────────────────────────── */
 const CELL_FONT = { 3: '14px', 4: '11px', 5: '9px', 6: '7.5px', 7: '6.5px' };
 
@@ -364,14 +366,14 @@ function triggerVictory() {
     /* Start the EmmaBonkersViz animation */
     const canvas = document.getElementById('confetti-canvas');
     const imgEl  = document.getElementById('emma-img');
-    confettiAnim = new EmmaBonkersViz(canvas, imgEl);
-    confettiAnim.onComplete = () => {
+    victoryViz = new EmmaBonkersViz(canvas, imgEl);
+    victoryViz.onComplete = () => {
         /* After 60 s: hide viz-active, reveal the victory panel */
         overlay.classList.remove('viz-active');
         box.classList.remove('box-hidden');
         box.classList.add('box-revealed');
     };
-    confettiAnim.start();
+    victoryViz.start();
 }
 
 function closeVictory() {
@@ -380,7 +382,7 @@ function closeVictory() {
     overlay.classList.add('hidden');
     overlay.classList.remove('viz-active');
     box.classList.remove('box-hidden', 'box-revealed');
-    if (confettiAnim) { confettiAnim.stop(); confettiAnim = null; }
+    if (victoryViz) { victoryViz.stop(); victoryViz = null; }
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
 }
 
@@ -457,10 +459,10 @@ document.addEventListener('DOMContentLoaded', () => {
     /* During animation: tap anywhere on the overlay to increase chaos.
        After animation: clicking the dark backdrop closes the overlay.       */
     document.getElementById('victory-overlay').addEventListener('click', (e) => {
-        if (confettiAnim && confettiAnim.running) {
+        if (victoryViz && victoryViz.running) {
             /* Don't count clicks on the close button as "more chaos" taps */
             if (!e.target.closest('#btn-close-victory')) {
-                confettiAnim.onTap();
+                victoryViz.onTap();
             }
             return;
         }
