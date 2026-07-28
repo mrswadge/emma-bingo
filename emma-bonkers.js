@@ -39,6 +39,7 @@ class EmmaBonkersViz {
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS     = 52;
     static KALEIDOSCOPE_OVERSCAN = 1.14; // 14% overscan prevents edge exposure while rotating
+    static HUE_SCALE_FACTOR = 0.45; // blend per-particle hue with tap palette shift
 
     constructor(canvas, imgEl) {
         this.canvas     = canvas;
@@ -310,7 +311,7 @@ class EmmaBonkersViz {
             ctx.globalAlpha = p.alpha;
 
             if (hasPhoto) {
-                const hueRotate = ((p.hue * 0.45 + this.paletteShift) | 0) % 360;
+                const hueRotate = ((p.hue * EmmaBonkersViz.HUE_SCALE_FACTOR + this.paletteShift) | 0) % 360;
                 ctx.filter = `hue-rotate(${hueRotate}deg) brightness(${bri}) saturate(${sat}) contrast(${con})`;
                 ctx.drawImage(this.img, -sz / 2, -sz / 2, sz, sz);
             } else {

@@ -124,7 +124,7 @@ const EMMA_EXCLAMATIONS = [
 /* Common female voice labels seen across major browser/platform voice packs. */
 const FEMALE_VOICE_NAMES = [
     'female', 'woman', 'samantha', 'victoria', 'karen', 'zira', 'hazel', 'susan',
-    'serena', 'aria', 'libby', 'sonia', 'ava', 'allison', 'joanna', 'amy', 'emma',
+    'serena', 'aria', 'Libby', 'sonia', 'ava', 'allison', 'joanna', 'amy', 'emma',
     'olivia', 'salli', 'raveena', 'moira', 'kendra', 'google uk english female'
 ];
 const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
@@ -326,7 +326,7 @@ function playVictoryMusic() {
 
             const lead = ctx.createOscillator();
             const leadGain = ctx.createGain();
-            /* Alternate odd/even notes so transients cut through while staying warm. */
+            /* Triangle on odd indices, sawtooth on even indices for alternating tone color. */
             lead.type = i % 2 ? 'triangle' : 'sawtooth';
             lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[i]), t0);
             leadGain.gain.setValueAtTime(0, t0);
