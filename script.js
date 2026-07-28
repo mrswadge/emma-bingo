@@ -136,6 +136,7 @@ const VICTORY_MELODY_NOTES = [74, 76, 79, 81, 79, 76, 74, 72];
 const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
 const VOCAL_INITIAL_DELAY_MS = 120;
 const VOCAL_PHRASE_INTERVAL_MS = 1650;
+const VOCAL_RATE = 1.18;
 const VOCAL_PITCH_STANDARD = 1.18;
 const VOCAL_PITCH_HIGH = 1.32;
 
@@ -437,7 +438,7 @@ function playVictoryVocals(primaryPhrase) {
         const timer = setTimeout(() => {
             const msg = new SpeechSynthesisUtterance(line);
             msg.lang = 'en-GB';
-            msg.rate = 1.18;
+            msg.rate = VOCAL_RATE;
             msg.pitch = index % 2 ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
             msg.volume = 1;
             if (femaleVoice) msg.voice = femaleVoice;
