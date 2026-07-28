@@ -121,6 +121,7 @@ const EMMA_EXCLAMATIONS = [
     "You scared meeee!! He-yyyy!"
 ];
 
+/* Common female voice labels seen across major browser/platform voice packs. */
 const FEMALE_VOICE_HINTS = /(female|woman|samantha|victoria|karen|zira|hazel|susan|serena|aria|libby|sonia|ava|allison|joanna|amy|emma|olivia|salli|raveena|moira|kendra|google uk english female)/i;
 const VICTORY_MUSIC_BPM = 98;
 /* D4, E4, G4, A4, G4, E4, D4, C4 */
@@ -231,7 +232,7 @@ function parseUrlState() {
     return {
         mode: modeParam === 'custom' || modeParam === 'weekly' ? modeParam : null,
         size: Number.isInteger(sizeParam) && sizeParam >= 3 && sizeParam <= 7 ? sizeParam : null,
-        seed: Number.isFinite(seedNum) && seedNum >= 0 ? (seedNum >>> 0) : null
+        seed: Number.isInteger(seedNum) && seedNum >= 0 && seedNum <= 0xFFFFFFFF ? (seedNum >>> 0) : null
     };
 }
 
@@ -555,6 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlState = parseUrlState();
     if (urlState.size) gridSel.value = String(urlState.size);
     if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+        /* Prime voice loading early so female voice selection is ready on win. */
         window.speechSynthesis.getVoices();
         window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices(), { once: true });
     }

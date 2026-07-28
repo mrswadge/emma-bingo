@@ -179,6 +179,7 @@ class EmmaBonkersViz {
            centre.  The slight zoom creates the infinite-tunnel pull-in.
            globalAlpha < 1 makes old content decay, preventing blow-up.     */
         const feedAlpha = useKaleo ? 0.82 : 0.89;
+        /* Keep zoom/swirl restrained so repeated taps don't expose edge/border artifacts. */
         const zoom      = 1.004 + intensity * 0.004;
         const swirl     = (0.0018 + intensity * 0.0042) * Math.sin(t * 0.27);
         tCtx.save();
@@ -347,7 +348,7 @@ class EmmaBonkersViz {
             /* Clip to a pie-slice so only one segment shows */
             this.ctx.beginPath();
             this.ctx.moveTo(0, 0);
-            /* Slightly over-extend radius and angles to hide visible slice seams */
+            /* Slightly over-extend radius/angles to hide antialias seams between slices */
             this.ctx.arc(0, 0, this._hypot + 4, -0.012, segAngle + 0.012);
             this.ctx.closePath();
             this.ctx.clip();
