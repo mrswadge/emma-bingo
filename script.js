@@ -86,7 +86,7 @@ const PHRASES = [
     "I dunno, why would you ask me?!",
     "Wait, what happened?",
     "Be quiet.",
-    "You sound like a \u2026",
+    "You sound like a …",
     "It's SOOO CUTE!!",
     "Soorry.",
     "That's offensaave!",
@@ -100,12 +100,12 @@ const PHRASES = [
     "How's that even possible??",
     "I'M COOOLD!",
     "IT'S TOO HOT!",
-    "My butt hurts\u2026",
-    "It's not my fault\u2026",
-    "What does that mean\u2026"
+    "My butt hurts…",
+    "It's not my fault…",
+    "What does that mean…"
 ];
 
-/* Victory exclamations spoken aloud and displayed on the win screen */
+/* Victory exclamations displayed on the win screen */
 const EMMA_EXCLAMATIONS = [
     "OH MY GOD WHATS THIS!?",
     "Hehehehheheheheheehhahahahahahah!!",
@@ -116,30 +116,119 @@ const EMMA_EXCLAMATIONS = [
     "You're so annoying! Can we get a dog?",
     "Wait whaaat?? HONESTLY??",
     "I wasn't listening, soorry!",
-    "My butt hurts\u2026 it's infuriating!",
+    "My butt hurts… it's infuriating!",
     "ITS TOO HOT! Can we have pudding?",
     "You scared meeee!! He-yyyy!"
 ];
 
-/* Common female voice labels seen across major browser/platform voice packs. */
-const FEMALE_VOICE_NAMES = [
-    'female', 'woman', 'samantha', 'victoria', 'karen', 'zira', 'hazel', 'susan',
-    'serena', 'aria', 'Libby', 'sonia', 'ava', 'allison', 'joanna', 'amy', 'emma',
-    'olivia', 'salli', 'raveena', 'moira', 'kendra', 'google uk english female'
+const SOUND_FILES = [
+    "Alex isn't helping.ogg",
+    "Alex isn't sharing.ogg",
+    "Alex won't let me.ogg",
+    "Are you sure.ogg",
+    "Asmar taps aggressively.ogg",
+    "Be quiet.ogg",
+    "But I want some.ogg",
+    "Can I have some.ogg",
+    "Can I have sweets.ogg",
+    "Can we do something else.ogg",
+    "Can we get a dog.ogg",
+    "Can we have pudding.ogg",
+    "Can we watch TV.ogg",
+    "Can you buy it for me.ogg",
+    "Can you get me one.ogg",
+    "Can you help me.ogg",
+    "Can't be bothered.ogg",
+    "Da-ddy.ogg",
+    "Do we have to.ogg",
+    "EWWWWWW.ogg",
+    "Go away.ogg",
+    "Good for you.ogg",
+    "He-yyyy.ogg",
+    "Hehehehheheheheheehhahahahahahah.ogg",
+    "Hey, I was sitting there.ogg",
+    "Honestly.ogg",
+    "How do you do this.ogg",
+    "How do you know that.ogg",
+    "How's that even possible.ogg",
+    "Huh.ogg",
+    "Hurry up.ogg",
+    "I can't help it.ogg",
+    "I don't WANT TO.ogg",
+    "I don't care.ogg",
+    "I don't get it.ogg",
+    "I don't know what to do.ogg",
+    "I don't know.ogg",
+    "I don't like shopping.ogg",
+    "I don't understand.ogg",
+    "I dunno, why would you ask me.ogg",
+    "I feel sick.ogg",
+    "I guess so.ogg",
+    "I want to go home.ogg",
+    "I wasn't listening.ogg",
+    "I'M COOOLD.ogg",
+    "I'll do it.ogg",
+    "I'm bored.ogg",
+    "I'm going to bed.ogg",
+    "I'm hungry.ogg",
+    "I'm thirsty.ogg",
+    "IT'S TOO HOT.ogg",
+    "It wasn't ME-E.ogg",
+    "It's SOOO CUTE.ogg",
+    "It's infuriating.ogg",
+    "It's not my fault.ogg",
+    "Just be quiet.ogg",
+    "Mummy.ogg",
+    "My butt hurts.ogg",
+    "NAAAOOO.ogg",
+    "Naaauw.ogg",
+    "Not helpful.ogg",
+    "OH MY GOD WHAT IS THAT.ogg",
+    "OH MY GOD.ogg",
+    "Ow, that hurt.ogg",
+    "Really.ogg",
+    "School is boring.ogg",
+    "Shut-up.ogg",
+    "Soorry.ogg",
+    "That looks nice.ogg",
+    "That looks pretty.ogg",
+    "That's boring.ogg",
+    "That's just not my problem.ogg",
+    "That's just stupid.ogg",
+    "That's nice.ogg",
+    "That's not fair.ogg",
+    "That's not true.ogg",
+    "That's offensaave.ogg",
+    "That's weird.ogg",
+    "That's your problem.ogg",
+    "They look old.ogg",
+    "Urgh.ogg",
+    "Wait what.ogg",
+    "Wait, what did you say.ogg",
+    "Wait, what happened.ogg",
+    "What are you doing.ogg",
+    "What does that mean.ogg",
+    "What's for dinner.ogg",
+    "What's the point.ogg",
+    "What's the time.ogg",
+    "What.ogg",
+    "Where are we going.ogg",
+    "Where are we.ogg",
+    "Why are we here.ogg",
+    "Why can't you tell me.ogg",
+    "Why would you do that.ogg",
+    "You scared meeee.ogg",
+    "You sound like a.ogg",
+    "You're so annoying.ogg",
+    "Your face.ogg"
 ];
-const FEMALE_VOICE_HINTS = new RegExp(FEMALE_VOICE_NAMES.join('|'), 'i');
+const SOUND_REPEAT_GAP_MS = 140;
 const MIN_BOARD_SIZE = 3;
 const MAX_BOARD_SIZE = 7;
 const VICTORY_MUSIC_BPM = 138;
 /* Fast trance-style 8-step patterns */
 const VICTORY_MELODY_NOTES = [74, 76, 79, 81, 79, 76, 74, 72];
 const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
-const VOCAL_INITIAL_DELAY_MS = 120;
-const VOCAL_PHRASE_INTERVAL_MS = 1650;
-const VOCAL_RATE = 1.18;
-const VOCAL_PITCH_STANDARD = 1.18;
-const VOCAL_PITCH_HIGH = 1.32;
-const HIGH_PITCH_VOCAL_INDICES = new Set([1, 3]);
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
@@ -154,6 +243,113 @@ function mulberry32(seed) {
     };
 }
 
+function hashString32(value) {
+    let hash = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+        hash ^= value.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return hash >>> 0;
+}
+
+function normaliseText(value) {
+    return value
+        .toLowerCase()
+        .normalize('NFKD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, ' and ')
+        .replace(/\*/g, ' ')
+        .replace(/…|\.\.\./g, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function tokenise(value) {
+    return normaliseText(value).split(/\s+/).filter(Boolean);
+}
+
+function getBigrams(value) {
+    const compact = normaliseText(value).replace(/\s+/g, '');
+    if (compact.length < 2) return compact ? [compact] : [];
+    const grams = [];
+    for (let i = 0; i < compact.length - 1; i++) grams.push(compact.slice(i, i + 2));
+    return grams;
+}
+
+function diceCoefficient(a, b) {
+    const aa = getBigrams(a);
+    const bb = getBigrams(b);
+    if (!aa.length || !bb.length) return aa.length === bb.length ? 1 : 0;
+    const counts = new Map();
+    for (const gram of aa) counts.set(gram, (counts.get(gram) || 0) + 1);
+    let matches = 0;
+    for (const gram of bb) {
+        const count = counts.get(gram) || 0;
+        if (count > 0) {
+            matches++;
+            counts.set(gram, count - 1);
+        }
+    }
+    return (2 * matches) / (aa.length + bb.length);
+}
+
+function scorePhraseMatch(phrase, sound) {
+    if (phrase.normalized === sound.normalized) return 100;
+
+    const phraseTokens = phrase.tokens;
+    const soundTokens = sound.tokens;
+    let overlap = 0;
+    for (const token of phraseTokens) {
+        if (soundTokens.includes(token)) overlap++;
+    }
+
+    const tokenScore = overlap / Math.max(phraseTokens.length, soundTokens.length, 1);
+    const coverageScore = overlap / Math.max(Math.min(phraseTokens.length, soundTokens.length), 1);
+    const charScore = diceCoefficient(phrase.label, sound.label);
+    const containsBonus =
+        phrase.normalized.includes(sound.normalized) || sound.normalized.includes(phrase.normalized)
+            ? 0.12
+            : 0;
+
+    return tokenScore * 0.56 + coverageScore * 0.22 + charScore * 0.22 + containsBonus;
+}
+
+const SOUND_LIBRARY = SOUND_FILES.map(file => {
+    const label = file.replace(/\.ogg$/i, '');
+    return {
+        file,
+        label,
+        normalized: normaliseText(label),
+        tokens: tokenise(label),
+        url: `sounds/${encodeURIComponent(file)}`
+    };
+});
+
+const SOUND_MATCH_CACHE = new Map();
+
+function findBestSoundForPhrase(phraseText) {
+    if (SOUND_MATCH_CACHE.has(phraseText)) return SOUND_MATCH_CACHE.get(phraseText);
+
+    const phrase = {
+        label: phraseText,
+        normalized: normaliseText(phraseText),
+        tokens: tokenise(phraseText)
+    };
+
+    let best = SOUND_LIBRARY[0] || null;
+    let bestScore = -Infinity;
+    for (const sound of SOUND_LIBRARY) {
+        const score = scorePhraseMatch(phrase, sound);
+        if (score > bestScore) {
+            best = sound;
+            bestScore = score;
+        }
+    }
+
+    SOUND_MATCH_CACHE.set(phraseText, best);
+    return best;
+}
+
 /* ── Week Key ────────────────────────────────────────────────────────────────
    Returns "YYYY-MM-DD" for the Monday of the current week (weeks run Mon-Sun).
    Weekly progress is keyed to this value so boards roll over each week.
@@ -161,13 +357,18 @@ function mulberry32(seed) {
 function getWeekKey() {
     const now = new Date();
     const dow = now.getDay();                      // 0=Sun … 6=Sat
-    const offset = dow === 0 ? 6 : dow - 1;        // days since Monday
+    const offset = dow === 0 ? 6 : dow - 1;       // days since Monday
     const mon = new Date(now);
+    mon.setHours(12, 0, 0, 0);
     mon.setDate(now.getDate() - offset);
     const y = mon.getFullYear();
     const m = String(mon.getMonth() + 1).padStart(2, '0');
     const d = String(mon.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
+}
+
+function getWeeklySeed(size) {
+    return hashString32(`${getWeekKey()}:${size}:weekly`) >>> 0;
 }
 
 /* ── Grid Helpers ────────────────────────────────────────────────────────────
@@ -195,42 +396,66 @@ function selectWords(size, seed) {
     return pool.slice(0, count);
 }
 
-/* ── LocalStorage Helpers ────────────────────────────────────────────────────
-   Keys are namespaced by mode ('weekly'|'custom'), week-start date and size
-   so state auto-expires when the week rolls over.
-   ──────────────────────────────────────────────────────────────────────────── */
+/* ── LocalStorage Helpers ──────────────────────────────────────────────────── */
 const STORE_NS = 'emmaBingo';
 
-function storageKey(mode, size) {
+function storageKey(mode, size, seed) {
+    if (mode === 'custom') {
+        return `${STORE_NS}_${mode}_${getWeekKey()}_${size}_${seed >>> 0}`;
+    }
     return `${STORE_NS}_${mode}_${getWeekKey()}_${size}`;
 }
 
-function loadSavedState(mode, size) {
+function customPointerKey(size) {
+    return `${STORE_NS}_customCurrent_${getWeekKey()}_${size}`;
+}
+
+function getCurrentCustomSeed(size) {
     try {
-        const raw = localStorage.getItem(storageKey(mode, size));
+        const raw = localStorage.getItem(customPointerKey(size));
+        const seed = raw === null ? null : Number(raw);
+        return Number.isInteger(seed) && seed >= 0 && seed <= 0xFFFFFFFF ? (seed >>> 0) : null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function setCurrentCustomSeed(size, seed) {
+    try {
+        localStorage.setItem(customPointerKey(size), String(seed >>> 0));
+    } catch (_) {}
+}
+
+function loadSavedState(mode, size, seed) {
+    try {
+        const lookupSeed = mode === 'custom' ? seed : getWeeklySeed(size);
+        if (mode === 'custom' && !Number.isInteger(lookupSeed)) return null;
+        const raw = localStorage.getItem(storageKey(mode, size, lookupSeed));
         if (!raw) return null;
         const obj = JSON.parse(raw);
-        /* Sanity-check: must match current week and size */
         if (obj.weekKey !== getWeekKey() || obj.gridSize !== size) return null;
+        if (mode === 'weekly' && (obj.seed >>> 0) !== getWeeklySeed(size)) return null;
+        if (mode === 'custom' && (obj.seed >>> 0) !== (lookupSeed >>> 0)) return null;
         return obj;
-    } catch (err) {
+    } catch (_) {
         return null;
     }
 }
 
 function persistState(mode, state) {
     try {
-        localStorage.setItem(storageKey(mode, state.gridSize), JSON.stringify(state));
-    } catch (err) { /* storage full – silently ignore */ }
+        localStorage.setItem(storageKey(mode, state.gridSize, state.seed), JSON.stringify(state));
+        if (mode === 'custom') setCurrentCustomSeed(state.gridSize, state.seed);
+    } catch (_) { /* storage full – silently ignore */ }
 }
 
 function buildFreshState(size, seed) {
     return {
         gridSize: size,
-        words:    selectWords(size, seed),
-        crossed:  new Array(size * size).fill(false),
-        weekKey:  getWeekKey(),
-        seed
+        words: selectWords(size, seed),
+        crossed: new Array(size * size).fill(false),
+        weekKey: getWeekKey(),
+        seed: seed >>> 0
     };
 }
 
@@ -257,29 +482,18 @@ function persistUrlState(mode, size, seed, push) {
     window.history[method]({}, '', url);
 }
 
-/* ── App State ───────────────────────────────────────────────────────────────
-   gameState  – current board words, crosses and metadata
-   boardMode  – 'weekly' | 'custom'
-   victoryViz – EmmaBonkersViz instance while victory overlay is open
-   ──────────────────────────────────────────────────────────────────────────── */
-let gameState    = null;
-let boardMode    = 'weekly';
+/* ── App State ─────────────────────────────────────────────────────────────── */
+let gameState = null;
+let boardMode = 'weekly';
 let victoryViz = null;
-let winAudioCtx  = null;
+let winAudioCtx = null;
 let winAudioNodes = [];
 let winAudioStopTimer = null;
-let winSpeechTimers = [];
-
-function getFemaleVoice() {
-    if (!('speechSynthesis' in window)) return null;
-    const voices = window.speechSynthesis.getVoices();
-    if (!voices.length) return null;
-
-    const englishVoices = voices.filter(v => /^en(-|$)/i.test(v.lang));
-    const englishVoicePool = englishVoices.length ? englishVoices : [];
-    /* Prefer a named female English voice; fall back to any English voice */
-    return englishVoicePool.find(v => FEMALE_VOICE_HINTS.test(v.name)) || englishVoicePool[0] || null;
-}
+let phraseAudio = null;
+let victorySoundAudio = null;
+let victorySoundLoopToken = 0;
+let lastSoundUrl = null;
+let lastSoundAt = 0;
 
 function ensureWinAudioContext() {
     if (!window.AudioContext && !window.webkitAudioContext) return null;
@@ -305,12 +519,6 @@ function stopVictoryMusic() {
     winAudioNodes = [];
 }
 
-function stopVictoryVocals() {
-    for (const timer of winSpeechTimers) clearTimeout(timer);
-    winSpeechTimers = [];
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-}
-
 function midiToFreq(note) {
     return 440 * Math.pow(2, (note - 69) / 12);
 }
@@ -334,7 +542,6 @@ function playVictoryMusic() {
     master.connect(ctx.destination);
     winAudioNodes.push(master);
 
-    /* Pumping sidechain-style volume motion */
     for (let b = 0; b < bars * 4; b++) {
         const bt = now + b * beat;
         master.gain.setValueAtTime(0.2, bt);
@@ -345,7 +552,6 @@ function playVictoryMusic() {
     for (let s = 0; s < totalSteps; s++) {
         const t0 = now + s * step;
 
-        /* Four-on-the-floor kick */
         if (s % stepsPerBeat === 0) {
             const kick = ctx.createOscillator();
             const kickGain = ctx.createGain();
@@ -362,7 +568,6 @@ function playVictoryMusic() {
             winAudioNodes.push(kick, kickGain);
         }
 
-        /* Bright off-beat hat */
         if (s % stepsPerBeat === 1) {
             const hat = ctx.createOscillator();
             const hatGain = ctx.createGain();
@@ -411,77 +616,119 @@ function playVictoryMusic() {
     winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
 }
 
-function randomPhraseExcluding(pool, exclude) {
-    const candidates = pool.filter(phrase => !exclude.has(phrase));
-    if (!candidates.length) return pool[Math.floor(Math.random() * pool.length)];
-    return candidates[Math.floor(Math.random() * candidates.length)];
+function stopAudioInstance(audio) {
+    if (!audio) return;
+    try {
+        audio.pause();
+        audio.currentTime = 0;
+    } catch (_) {}
 }
 
-function playVictoryVocals(primaryPhrase) {
-    if (!('speechSynthesis' in window)) return;
+function playSoundMatch(sound, opts = {}) {
+    if (!sound) return null;
 
-    stopVictoryVocals();
+    const { channel = 'phrase', rate = 1, volume = 1, onEnded = null } = opts;
+    const now = performance.now();
+    const tooSoon = lastSoundUrl === sound.url && (now - lastSoundAt) < SOUND_REPEAT_GAP_MS;
+    if (tooSoon && channel === 'phrase') return null;
 
-    const femaleVoice = getFemaleVoice();
-    const used = new Set([primaryPhrase]);
-    const extraA = randomPhraseExcluding(PHRASES, used);
-    used.add(extraA);
-    const extraB = randomPhraseExcluding(PHRASES, used);
+    const audio = new Audio(sound.url);
+    audio.preload = 'auto';
+    audio.playbackRate = rate;
+    audio.volume = volume;
+    if (typeof onEnded === 'function') audio.addEventListener('ended', onEnded, { once: true });
+    audio.addEventListener('error', () => { if (typeof onEnded === 'function') onEnded(); }, { once: true });
 
-    const vocalLines = [
-        'EMMA BINGO!',
-        primaryPhrase,
-        extraA,
-        extraB
-    ];
+    if (channel === 'phrase') {
+        stopAudioInstance(phraseAudio);
+        phraseAudio = audio;
+    } else if (channel === 'victory') {
+        stopAudioInstance(victorySoundAudio);
+        victorySoundAudio = audio;
+    }
 
-    vocalLines.forEach((line, index) => {
-        const timer = setTimeout(() => {
-            const msg = new SpeechSynthesisUtterance(line);
-            msg.lang = 'en-GB';
-            msg.rate = VOCAL_RATE;
-            const useHighPitch = HIGH_PITCH_VOCAL_INDICES.has(index);
-            msg.pitch = useHighPitch ? VOCAL_PITCH_HIGH : VOCAL_PITCH_STANDARD;
-            msg.volume = 1;
-            if (femaleVoice) msg.voice = femaleVoice;
-            window.speechSynthesis.speak(msg);
-        }, VOCAL_INITIAL_DELAY_MS + index * VOCAL_PHRASE_INTERVAL_MS);
-        winSpeechTimers.push(timer);
+    lastSoundUrl = sound.url;
+    lastSoundAt = now;
+    audio.play().catch(() => {
+        if (channel === 'phrase' && phraseAudio === audio) phraseAudio = null;
+        if (channel === 'victory' && victorySoundAudio === audio) victorySoundAudio = null;
+        if (typeof onEnded === 'function') onEnded();
     });
+    return audio;
 }
 
-/* ── Font Sizes ──────────────────────────────────────────────────────────────
-   Approximate cell text size for each grid dimension, injected as a CSS
-   custom property so CSS can reference it without JS repetition.
-   Supported sizes: 3×3 to 7×7 (matching the grid-size selector options).
-   The '9px' fallback in renderGrid covers any unexpected grid size.
-   ──────────────────────────────────────────────────────────────────────────── */
+function playPhraseSound(phraseText) {
+    playSoundMatch(findBestSoundForPhrase(phraseText), { channel: 'phrase', volume: 1 });
+}
+
+function pickRandomVictorySound() {
+    if (!SOUND_LIBRARY.length) return null;
+    if (SOUND_LIBRARY.length === 1) return SOUND_LIBRARY[0];
+    let candidate = SOUND_LIBRARY[Math.floor(Math.random() * SOUND_LIBRARY.length)];
+    if (victorySoundAudio && candidate.url === victorySoundAudio.src) {
+        candidate = SOUND_LIBRARY[(SOUND_LIBRARY.indexOf(candidate) + 1) % SOUND_LIBRARY.length];
+    }
+    return candidate;
+}
+
+function stopVictorySoundLoop() {
+    victorySoundLoopToken++;
+    stopAudioInstance(victorySoundAudio);
+    victorySoundAudio = null;
+}
+
+function scheduleNextVictorySound(loopToken, delay = 0) {
+    window.setTimeout(() => {
+        if (loopToken !== victorySoundLoopToken || !victoryViz || !victoryViz.running) return;
+        const sound = pickRandomVictorySound();
+        if (!sound) return;
+        playSoundMatch(sound, {
+            channel: 'victory',
+            volume: 0.95,
+            onEnded: () => scheduleNextVictorySound(loopToken, 120 + Math.random() * 240)
+        });
+    }, delay);
+}
+
+function startVictorySoundLoop() {
+    stopVictorySoundLoop();
+    const loopToken = victorySoundLoopToken;
+    scheduleNextVictorySound(loopToken, 0);
+}
+
+/* ── Font Sizes ────────────────────────────────────────────────────────────── */
 const CELL_FONT = { 3: '14px', 4: '11px', 5: '9px', 6: '7.5px', 7: '6.5px' };
 
-/* ── Progress Bar ────────────────────────────────────────────────────────────*/
 function updateProgress() {
     const { gridSize, crossed } = gameState;
-    const total  = gridSize * gridSize;
+    const total = gridSize * gridSize;
     const center = getCenterIndex(gridSize);
-    const cells  = total - (center >= 0 ? 1 : 0);
-    const done   = crossed.filter(Boolean).length;
+    const cells = total - (center >= 0 ? 1 : 0);
+    const done = crossed.filter(Boolean).length;
 
     document.getElementById('progress-text').textContent = `${done} / ${cells} crossed off`;
     document.getElementById('progress-fill').style.width = `${(done / cells) * 100}%`;
 }
 
-/* ── Grid Rendering ──────────────────────────────────────────────────────────*/
+function getPhraseAtCellIndex(index) {
+    const center = getCenterIndex(gameState.gridSize);
+    if (index === center) return null;
+    let wordIndex = index;
+    if (center >= 0 && index > center) wordIndex--;
+    return gameState.words[wordIndex] || null;
+}
+
+/* ── Grid Rendering ────────────────────────────────────────────────────────── */
 function renderGrid() {
     const gridEl = document.getElementById('bingo-grid');
     gridEl.innerHTML = '';
 
-    const { gridSize, words, crossed } = gameState;
+    const { gridSize, crossed } = gameState;
     gridEl.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
     document.documentElement.style.setProperty('--cell-font', CELL_FONT[gridSize] || '9px');
 
-    const total  = gridSize * gridSize;
+    const total = gridSize * gridSize;
     const center = getCenterIndex(gridSize);
-    let wi = 0; /* word index (skips centre slot) */
 
     for (let i = 0; i < total; i++) {
         const cell = document.createElement('div');
@@ -489,7 +736,6 @@ function renderGrid() {
         cell.dataset.ci = i;
 
         if (i === center) {
-            /* ── Logo / free-space cell ── */
             cell.classList.add('center-cell');
             cell.setAttribute('aria-label', 'Emma Bingo – free space');
             cell.innerHTML = `
@@ -498,8 +744,7 @@ function renderGrid() {
                     <span class="logo-text">EMMA<br>BINGO</span>
                 </div>`;
         } else {
-            /* ── Phrase cell ── */
-            const text = words[wi++];
+            const text = getPhraseAtCellIndex(i);
             cell.textContent = text;
             cell.setAttribute('role', 'button');
             cell.setAttribute('tabindex', '0');
@@ -508,7 +753,7 @@ function renderGrid() {
 
             if (crossed[i]) cell.classList.add('crossed');
 
-            cell.addEventListener('click',   () => toggleCell(i));
+            cell.addEventListener('click', () => toggleCell(i));
             cell.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -523,10 +768,11 @@ function renderGrid() {
     updateProgress();
 }
 
-/* ── Cell Toggle ─────────────────────────────────────────────────────────────*/
+/* ── Cell Toggle ───────────────────────────────────────────────────────────── */
 function toggleCell(i) {
     if (i === getCenterIndex(gameState.gridSize)) return;
 
+    const phrase = getPhraseAtCellIndex(i);
     gameState.crossed[i] = !gameState.crossed[i];
     persistState(boardMode, gameState);
 
@@ -534,19 +780,20 @@ function toggleCell(i) {
     if (cell) {
         cell.classList.toggle('crossed', gameState.crossed[i]);
         cell.setAttribute('aria-pressed', gameState.crossed[i] ? 'true' : 'false');
-        cell.setAttribute('aria-label',
-            cell.textContent.trim() + (gameState.crossed[i] ? ' – crossed off' : ''));
+        cell.setAttribute('aria-label', cell.textContent.trim() + (gameState.crossed[i] ? ' – crossed off' : ''));
     }
+
+    if (phrase) playPhraseSound(phrase);
 
     updateProgress();
 
     if (checkVictory()) triggerVictory();
 }
 
-/* ── Victory Detection ───────────────────────────────────────────────────────*/
+/* ── Victory Detection ─────────────────────────────────────────────────────── */
 function checkVictory() {
     const { gridSize, crossed } = gameState;
-    const total  = gridSize * gridSize;
+    const total = gridSize * gridSize;
     const center = getCenterIndex(gridSize);
     for (let i = 0; i < total; i++) {
         if (i === center) continue;
@@ -555,76 +802,71 @@ function checkVictory() {
     return true;
 }
 
-/* ── Victory Presentation ────────────────────────────────────────────────────*/
+function syncVizModeButtons(activeMode) {
+    document.querySelectorAll('[data-viz-mode]').forEach(button => {
+        button.classList.toggle('active', button.dataset.vizMode === activeMode);
+    });
+}
+
+/* ── Victory Presentation ──────────────────────────────────────────────────── */
 function triggerVictory() {
     const phrase = EMMA_EXCLAMATIONS[Math.floor(Math.random() * EMMA_EXCLAMATIONS.length)];
     document.getElementById('victory-phrase').textContent = phrase;
 
     const overlay = document.getElementById('victory-overlay');
-    const box     = document.getElementById('victory-box');
+    const box = document.getElementById('victory-box');
 
-    /* Show overlay in viz-active mode: black background, canvas fills screen */
     overlay.classList.remove('hidden');
     overlay.classList.add('viz-active');
     box.classList.add('box-hidden');
     box.classList.remove('box-revealed');
 
-    playVictoryVocals(phrase);
     playVictoryMusic();
 
-    /* Start the EmmaBonkersViz animation */
     const canvas = document.getElementById('confetti-canvas');
-    const imgEl  = document.getElementById('emma-img');
+    const imgEl = document.getElementById('emma-img');
     victoryViz = new EmmaBonkersViz(canvas, imgEl);
+    victoryViz.setMode('psychedelic');
+    syncVizModeButtons(victoryViz.effectMode);
     victoryViz.onComplete = () => {
-        /* After 60 s: hide viz-active, reveal the victory panel */
+        stopVictorySoundLoop();
         overlay.classList.remove('viz-active');
         box.classList.remove('box-hidden');
         box.classList.add('box-revealed');
     };
     victoryViz.start();
+    startVictorySoundLoop();
 }
 
 function closeVictory() {
     const overlay = document.getElementById('victory-overlay');
-    const box     = document.getElementById('victory-box');
+    const box = document.getElementById('victory-box');
     overlay.classList.add('hidden');
     overlay.classList.remove('viz-active');
     box.classList.remove('box-hidden', 'box-revealed');
     if (victoryViz) { victoryViz.stop(); victoryViz = null; }
-    stopVictoryVocals();
+    stopVictorySoundLoop();
     stopVictoryMusic();
 }
 
-/* ── Board Initialisation ────────────────────────────────────────────────────
-   Loads saved state for the requested mode/size, or creates a fresh one.
-   ──────────────────────────────────────────────────────────────────────────── */
+/* ── Board Initialisation ──────────────────────────────────────────────────── */
 function initBoard(size, mode, overrideSeed, pushHistory) {
     boardMode = mode;
 
-    if (overrideSeed !== undefined && overrideSeed !== null) {
-        /* If URL/user provides a seed, restore matching board or create it */
-        const saved = loadSavedState(mode, size);
-        if (saved && (saved.seed >>> 0) === (overrideSeed >>> 0)) {
-            gameState = saved;
-        } else {
-            gameState = buildFreshState(size, overrideSeed >>> 0);
-            persistState(mode, gameState);
-        }
+    if (mode === 'weekly') {
+        const weeklySeed = getWeeklySeed(size);
+        gameState = loadSavedState('weekly', size, weeklySeed) || buildFreshState(size, weeklySeed);
+        persistState('weekly', gameState);
     } else {
-        const saved = loadSavedState(mode, size);
-        if (saved) {
-            gameState = saved;
-        } else {
-            const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
-            gameState = buildFreshState(size, seed);
-            persistState(mode, gameState);
-        }
+        const activeSeed = Number.isInteger(overrideSeed)
+            ? (overrideSeed >>> 0)
+            : (getCurrentCustomSeed(size) ?? ((Math.random() * 0xFFFFFFFF) >>> 0));
+        gameState = loadSavedState('custom', size, activeSeed) || buildFreshState(size, activeSeed);
+        persistState('custom', gameState);
     }
 
     persistUrlState(mode, size, gameState.seed, !!pushHistory);
 
-    /* Sync mode-button active state */
     document.querySelectorAll('.btn-mode').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.mode === mode);
     });
@@ -632,43 +874,34 @@ function initBoard(size, mode, overrideSeed, pushHistory) {
     renderGrid();
 }
 
-/* ── DOMContentLoaded ────────────────────────────────────────────────────────*/
 document.addEventListener('DOMContentLoaded', () => {
-    /* Week label in header */
     document.getElementById('week-label').textContent = getWeekKey();
 
     const gridSel = document.getElementById('grid-size');
     const urlState = parseUrlState();
     if (urlState.size) gridSel.value = String(urlState.size);
-    if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
-        /* Prime voice loading early so female voice selection is ready on win. */
-        window.speechSynthesis.getVoices();
-        window.speechSynthesis.addEventListener('voiceschanged', () => getFemaleVoice(), { once: true });
-    }
 
     document.addEventListener('pointerdown', () => { ensureWinAudioContext(); }, { once: true });
 
-    /* Grid size selector */
     gridSel.addEventListener('change', () => {
         closeVictory();
         initBoard(parseInt(gridSel.value, 10), boardMode, undefined, true);
     });
 
-    /* Weekly board */
     document.getElementById('btn-weekly').addEventListener('click', () => {
         closeVictory();
         initBoard(parseInt(gridSel.value, 10), 'weekly', undefined, true);
     });
 
-    /* Shuffle – always generate a brand-new random board */
     document.getElementById('btn-shuffle').addEventListener('click', () => {
         closeVictory();
         const size = parseInt(gridSel.value, 10);
-        const seed = (Math.random() * 0xFFFFFFFF) >>> 0;
+        const seed = boardMode === 'custom'
+            ? ((Math.random() * 0xFFFFFFFF) >>> 0)
+            : undefined;
         initBoard(size, 'custom', seed, true);
     });
 
-    /* Reset crosses on current board */
     document.getElementById('btn-reset').addEventListener('click', () => {
         if (!confirm('Clear all crossed-off phrases on this board?')) return;
         closeVictory();
@@ -677,15 +910,30 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrid();
     });
 
-    /* Close victory overlay */
     document.getElementById('btn-close-victory').addEventListener('click', closeVictory);
+    document.getElementById('btn-exit-viz').addEventListener('click', closeVictory);
 
-    /* During animation: tap anywhere on the overlay to increase chaos.
-       After animation: clicking the dark backdrop closes the overlay.       */
+    document.querySelector('[data-viz-action="more-emmas"]').addEventListener('click', () => {
+        if (!victoryViz || !victoryViz.running) return;
+        victoryViz.addMoreEmmas();
+    });
+
+    document.querySelector('[data-viz-action="more-colours"]').addEventListener('click', () => {
+        if (!victoryViz || !victoryViz.running) return;
+        victoryViz.intensifyColours();
+    });
+
+    document.querySelectorAll('[data-viz-mode]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (!victoryViz || !victoryViz.running) return;
+            victoryViz.setMode(button.dataset.vizMode);
+            syncVizModeButtons(victoryViz.effectMode);
+        });
+    });
+
     document.getElementById('victory-overlay').addEventListener('click', (e) => {
         if (victoryViz && victoryViz.running) {
-            /* Don't count clicks on the close button as "more chaos" taps */
-            if (!e.target.closest('#btn-close-victory')) {
+            if (!e.target.closest('#btn-close-victory') && !e.target.closest('.viz-controls')) {
                 victoryViz.onTap();
             }
             return;
@@ -693,11 +941,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === e.currentTarget) closeVictory();
     });
 
-    /* Boot */
     initBoard(
         parseInt(gridSel.value, 10),
         urlState.mode || 'weekly',
-        urlState.seed,
+        urlState.mode === 'custom' ? urlState.seed : undefined,
         false
     );
 });

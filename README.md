@@ -7,14 +7,14 @@ A fun, fully client-side bingo game built for GitHub Pages.
 1. Open the page – you get **your weekly board** (saved per player for that Mon–Sun week).
 2. **Tap / click a phrase** to cross it off.  Tap it again if you need to undo it.
 3. Keep going until all phrases are crossed off and the **EMMA BINGO!** celebration fires 🎊  
-   *(your browser will announce the winner via speech synthesis)*
+   *(matched Emma sound clips play instead of browser speech synthesis)*
 
 ## Controls
 
 | Button | What it does |
 |--------|--------------|
 | 📅 **Weekly** | Switch to your weekly board for this week |
-| 🔀 **Shuffle** | Generate a random board and persist it in the URL |
+| 🔀 **Shuffle** | Jump to this week's saved shuffle board, or make a new one if you press it again while already shuffling |
 | 🔄 **Reset** | Clear all crosses on the current board |
 | **Board size** | Choose 3×3, 4×4, 5×5 (default), 6×6 or 7×7 |
 
@@ -27,10 +27,11 @@ When all phrases are crossed off, a full-screen **MilkDrop/Geiss-style** animati
 - **Emma particles** — Emma's photo orbits, spirals, wobbles and tunnels across the screen with more prominent photo rendering
 - **Auto-stops after 60 seconds**, then the victory panel fades in
 - **Tap/click anywhere** during the animation to add more Emmas, randomise the colour palette, and increase the chaos (up to 12 taps)
+- Bottom controls let you switch between **psychedelic**, **fluid**, **tunnel**, and **waveform** visual modes, plus boost colours or add even more Emmas
 - At **tap level 3+**, a **kaleidoscope mirror effect** kicks in with increasing symmetry
 - At **tap level 5+**, all Emmas enter **tunnel mode** (flying toward the viewer)
-- Speech synthesis delivers a quick sequence of celebration phrases (female voice preferred when available)
-- Victory music is fast-paced trance/dance style with kick, bass, lead and off-beat hats
+- Random matched **Emma voice clips** play throughout the full-screen celebration, alongside fast-paced trance/dance victory music
+- A top-right **Exit** button jumps straight back to the board
 
 ### Adding Emma's photo
 
