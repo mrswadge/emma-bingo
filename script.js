@@ -225,10 +225,7 @@ const SOUND_FILES = [
 const SOUND_REPEAT_GAP_MS = 140;
 const MIN_BOARD_SIZE = 3;
 const MAX_BOARD_SIZE = 7;
-const VICTORY_MUSIC_BPM = 138;
-/* Fast trance-style 8-step patterns */
-const VICTORY_MELODY_NOTES = [74, 76, 79, 81, 79, 76, 74, 72];
-const VICTORY_BASS_NOTES = [38, 38, 41, 41, 36, 36, 33, 33];
+const VICTORY_MUSIC_TRACKS = ['music/victory-01.mp3', 'music/victory-02.mp3'];
 
 /* ── Seeded RNG: Mulberry32 ──────────────────────────────────────────────────
    Produces a deterministic sequence from a 32-bit integer seed.
@@ -486,9 +483,8 @@ function persistUrlState(mode, size, seed, push) {
 let gameState = null;
 let boardMode = 'weekly';
 let victoryViz = null;
-let winAudioCtx = null;
-let winAudioNodes = [];
-let winAudioStopTimer = null;
+let victoryMusicAudio = null;
+let currentVictoryMusicTrack = null;
 let phraseAudio = null;
 let victorySoundAudio = null;
 let victorySoundLoopToken = 0;
@@ -496,125 +492,45 @@ let currentVictorySoundUrl = null;
 let lastSoundUrl = null;
 let lastSoundAt = 0;
 
-function ensureWinAudioContext() {
-    if (!window.AudioContext && !window.webkitAudioContext) return null;
-    if (!winAudioCtx) {
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        winAudioCtx = new Ctx();
-    }
-    if (winAudioCtx.state === 'suspended') {
-        winAudioCtx.resume().catch(() => {});
-    }
-    return winAudioCtx;
-}
-
 function stopVictoryMusic() {
-    if (winAudioStopTimer) {
-        clearTimeout(winAudioStopTimer);
-        winAudioStopTimer = null;
-    }
-    for (const node of winAudioNodes) {
-        try { node.stop(); } catch (_) {}
-        try { node.disconnect(); } catch (_) {}
-    }
-    winAudioNodes = [];
+    stopAudioInstance(victoryMusicAudio);
+    victoryMusicAudio = null;
 }
 
-function midiToFreq(note) {
-    return 440 * Math.pow(2, (note - 69) / 12);
+function pickRandomVictoryMusicTrack() {
+    if (!VICTORY_MUSIC_TRACKS.length) return null;
+    if (VICTORY_MUSIC_TRACKS.length === 1) return VICTORY_MUSIC_TRACKS[0];
+    let index = Math.floor(Math.random() * VICTORY_MUSIC_TRACKS.length);
+    if (currentVictoryMusicTrack && VICTORY_MUSIC_TRACKS[index] === currentVictoryMusicTrack) {
+        index = (index + 1 + Math.floor(Math.random() * (VICTORY_MUSIC_TRACKS.length - 1))) % VICTORY_MUSIC_TRACKS.length;
+    }
+    return VICTORY_MUSIC_TRACKS[index];
 }
 
 function playVictoryMusic() {
-    const ctx = ensureWinAudioContext();
-    if (!ctx) return;
-
     stopVictoryMusic();
+    const track = pickRandomVictoryMusicTrack();
+    if (!track) return;
 
-    const now = ctx.currentTime + 0.03;
-    const beat = 60 / VICTORY_MUSIC_BPM;
-    const bars = 8;
-    const stepsPerBeat = 2;
-    const step = beat / stepsPerBeat;
-    const totalSteps = bars * 4 * stepsPerBeat;
-
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, now);
-    master.gain.linearRampToValueAtTime(0.22, now + 0.2);
-    master.connect(ctx.destination);
-    winAudioNodes.push(master);
-
-    for (let b = 0; b < bars * 4; b++) {
-        const bt = now + b * beat;
-        master.gain.setValueAtTime(0.2, bt);
-        master.gain.exponentialRampToValueAtTime(0.11, bt + 0.08);
-        master.gain.linearRampToValueAtTime(0.2, bt + beat * 0.9);
-    }
-
-    for (let s = 0; s < totalSteps; s++) {
-        const t0 = now + s * step;
-
-        if (s % stepsPerBeat === 0) {
-            const kick = ctx.createOscillator();
-            const kickGain = ctx.createGain();
-            kick.type = 'sine';
-            kick.frequency.setValueAtTime(155, t0);
-            kick.frequency.exponentialRampToValueAtTime(42, t0 + 0.09);
-            kickGain.gain.setValueAtTime(0.0001, t0);
-            kickGain.gain.exponentialRampToValueAtTime(0.42, t0 + 0.003);
-            kickGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.11);
-            kick.connect(kickGain);
-            kickGain.connect(master);
-            kick.start(t0);
-            kick.stop(t0 + 0.12);
-            winAudioNodes.push(kick, kickGain);
+    const audio = new Audio(track);
+    audio.preload = 'auto';
+    audio.loop = true;
+    audio.volume = 0.6;
+    audio.addEventListener('error', () => {
+        if (victoryMusicAudio === audio) {
+            victoryMusicAudio = null;
+            currentVictoryMusicTrack = null;
         }
+    }, { once: true });
 
-        if (s % stepsPerBeat === 1) {
-            const hat = ctx.createOscillator();
-            const hatGain = ctx.createGain();
-            hat.type = 'square';
-            hat.frequency.setValueAtTime(9200, t0);
-            hatGain.gain.setValueAtTime(0.0001, t0);
-            hatGain.gain.exponentialRampToValueAtTime(0.08, t0 + 0.002);
-            hatGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.03);
-            hat.connect(hatGain);
-            hatGain.connect(master);
-            hat.start(t0);
-            hat.stop(t0 + 0.035);
-            winAudioNodes.push(hat, hatGain);
+    victoryMusicAudio = audio;
+    currentVictoryMusicTrack = track;
+    audio.play().catch(() => {
+        if (victoryMusicAudio === audio) {
+            victoryMusicAudio = null;
+            currentVictoryMusicTrack = null;
         }
-
-        const noteIndex = s % VICTORY_MELODY_NOTES.length;
-
-        const bass = ctx.createOscillator();
-        const bassGain = ctx.createGain();
-        bass.type = 'square';
-        bass.frequency.setValueAtTime(midiToFreq(VICTORY_BASS_NOTES[noteIndex]), t0);
-        bassGain.gain.setValueAtTime(0.0001, t0);
-        bassGain.gain.exponentialRampToValueAtTime(0.085, t0 + 0.01);
-        bassGain.gain.exponentialRampToValueAtTime(0.0001, t0 + step * 0.9);
-        bass.connect(bassGain);
-        bassGain.connect(master);
-        bass.start(t0);
-        bass.stop(t0 + step * 0.95);
-        winAudioNodes.push(bass, bassGain);
-
-        const lead = ctx.createOscillator();
-        const leadGain = ctx.createGain();
-        lead.type = 'sawtooth';
-        lead.frequency.setValueAtTime(midiToFreq(VICTORY_MELODY_NOTES[noteIndex]), t0);
-        leadGain.gain.setValueAtTime(0.0001, t0);
-        leadGain.gain.exponentialRampToValueAtTime(0.09, t0 + 0.01);
-        leadGain.gain.exponentialRampToValueAtTime(0.0001, t0 + step * 0.75);
-        lead.connect(leadGain);
-        leadGain.connect(master);
-        lead.start(t0);
-        lead.stop(t0 + step * 0.8);
-        winAudioNodes.push(lead, leadGain);
-    }
-
-    const totalDurationMs = (totalSteps * step + 0.8) * 1000;
-    winAudioStopTimer = setTimeout(() => stopVictoryMusic(), totalDurationMs);
+    });
 }
 
 function stopAudioInstance(audio) {
@@ -844,6 +760,7 @@ function triggerVictory() {
     syncVizModeButtons(victoryViz.effectMode);
     victoryViz.onComplete = () => {
         stopVictorySoundLoop();
+        stopVictoryMusic();
         overlay.classList.remove('viz-active');
         box.classList.remove('box-hidden');
         box.classList.add('box-revealed');
@@ -894,8 +811,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridSel = document.getElementById('grid-size');
     const urlState = parseUrlState();
     if (urlState.size) gridSel.value = String(urlState.size);
-
-    document.addEventListener('pointerdown', () => { ensureWinAudioContext(); }, { once: true });
 
     gridSel.addEventListener('change', () => {
         closeVictory();

@@ -30,7 +30,7 @@ When all phrases are crossed off, a full-screen **MilkDrop/Geiss-style** animati
 - Bottom controls let you switch between **psychedelic**, **fluid**, **tunnel**, and **waveform** visual modes, plus boost colours or add even more Emmas
 - At **tap level 3+**, a **kaleidoscope mirror effect** kicks in with increasing symmetry
 - At **tap level 5+**, all Emmas enter **tunnel mode** (flying toward the viewer)
-- Random matched **Emma voice clips** play throughout the full-screen celebration, alongside fast-paced trance/dance victory music
+- Random matched **Emma voice clips** play throughout the full-screen celebration over a randomly selected backing track (`music/victory-01.mp3` or `music/victory-02.mp3`)
 - A top-right **Exit** button jumps straight back to the board
 
 ### Adding Emma's photo
