@@ -11,7 +11,7 @@ class EmmaBonkersViz {
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS = 52;
     static HUE_SCALE_FACTOR = 0.45;
-    static TAP_HINT_BOTTOM_OFFSET = 84;
+    static TAP_HINT_BOTTOM_OFFSET = 84; // keeps the hint above the bottom visualization controls
     static MODES = ['psychedelic', 'fluid', 'tunnel', 'waveform'];
 
     constructor(canvas, imgEl) {
