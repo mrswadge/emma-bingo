@@ -105,7 +105,9 @@ class EmmaBonkersViz {
         const W = this.canvas.width;
         const H = this.canvas.height;
         const rMax = Math.min(W, H) * 0.44;
-        const styles = ['orbit', 'spiral', 'wobble', 'tunnel'];
+        const styles = burst
+            ? ['orbit', 'spiral', 'wobble', 'tunnel']
+            : ['orbit', 'spiral', 'wobble'];
         for (let i = 0; i < count; i++) {
             this.particles.push({
                 angle: Math.random() * Math.PI * 2,
@@ -145,7 +147,7 @@ class EmmaBonkersViz {
         const intensity = Math.min(1, 0.22 + this.tapLevel * 0.068 + (this.colourBoost - 1) * 0.12);
         const fadeStart = EmmaBonkersViz.DURATION_MS - 5_000;
         const fadeOut = Math.max(0, (elapsed - fadeStart) / 5_000);
-        const useKaleo = this.tapLevel >= 3 || this.effectMode === 'psychedelic';
+        const useKaleo = this.tapLevel >= 3;
 
         const tCtx = useKaleo ? this._tmpCtx : this.ctx;
         if (useKaleo) tCtx.clearRect(0, 0, W, H);
