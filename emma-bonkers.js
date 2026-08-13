@@ -147,7 +147,7 @@ class EmmaBonkersViz {
         const useKaleo = this.tapLevel >= 3 || this.effectMode === 'psychedelic';
 
         const tCtx = useKaleo ? this._tmpCtx : this.ctx;
-        tCtx.clearRect(0, 0, W, H);
+        if (useKaleo) tCtx.clearRect(0, 0, W, H);
 
         const feedAlpha = useKaleo ? 0.82 : 0.89;
         const zoom = 1.004 + intensity * 0.004 + (this.effectMode === 'tunnel' ? 0.0035 : 0);

@@ -649,8 +649,10 @@ function playSoundMatch(sound, opts = {}) {
         currentVictorySoundUrl = sound.url;
     }
 
-    lastSoundUrl = sound.url;
-    lastSoundAt = now;
+    if (channel === 'phrase') {
+        lastSoundUrl = sound.url;
+        lastSoundAt = now;
+    }
     audio.play().catch(() => {
         if (channel === 'phrase' && phraseAudio === audio) phraseAudio = null;
         if (channel === 'victory' && victorySoundAudio === audio) {
