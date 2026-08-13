@@ -359,8 +359,8 @@ function getWeekKey() {
     const dow = now.getDay();                      // 0=Sun … 6=Sat
     const offset = dow === 0 ? 6 : dow - 1;       // days since Monday
     const mon = new Date(now);
-    mon.setHours(12, 0, 0, 0);
     mon.setDate(now.getDate() - offset);
+    mon.setHours(12, 0, 0, 0);
     const y = mon.getFullYear();
     const m = String(mon.getMonth() + 1).padStart(2, '0');
     const d = String(mon.getDate()).padStart(2, '0');
@@ -492,6 +492,7 @@ let winAudioStopTimer = null;
 let phraseAudio = null;
 let victorySoundAudio = null;
 let victorySoundLoopToken = 0;
+let currentVictorySoundUrl = null;
 let lastSoundUrl = null;
 let lastSoundAt = 0;
 
@@ -645,13 +646,17 @@ function playSoundMatch(sound, opts = {}) {
     } else if (channel === 'victory') {
         stopAudioInstance(victorySoundAudio);
         victorySoundAudio = audio;
+        currentVictorySoundUrl = sound.url;
     }
 
     lastSoundUrl = sound.url;
     lastSoundAt = now;
     audio.play().catch(() => {
         if (channel === 'phrase' && phraseAudio === audio) phraseAudio = null;
-        if (channel === 'victory' && victorySoundAudio === audio) victorySoundAudio = null;
+        if (channel === 'victory' && victorySoundAudio === audio) {
+            victorySoundAudio = null;
+            currentVictorySoundUrl = null;
+        }
         if (typeof onEnded === 'function') onEnded();
     });
     return audio;
@@ -665,7 +670,7 @@ function pickRandomVictorySound() {
     if (!SOUND_LIBRARY.length) return null;
     if (SOUND_LIBRARY.length === 1) return SOUND_LIBRARY[0];
     let candidate = SOUND_LIBRARY[Math.floor(Math.random() * SOUND_LIBRARY.length)];
-    if (victorySoundAudio && candidate.url === victorySoundAudio.src) {
+    if (currentVictorySoundUrl && candidate.url === currentVictorySoundUrl) {
         candidate = SOUND_LIBRARY[(SOUND_LIBRARY.indexOf(candidate) + 1) % SOUND_LIBRARY.length];
     }
     return candidate;
@@ -675,6 +680,7 @@ function stopVictorySoundLoop() {
     victorySoundLoopToken++;
     stopAudioInstance(victorySoundAudio);
     victorySoundAudio = null;
+    currentVictorySoundUrl = null;
 }
 
 function scheduleNextVictorySound(loopToken, delay = 0) {
