@@ -671,11 +671,11 @@ function playPhraseSound(phraseText) {
 function pickRandomVictorySound() {
     if (!SOUND_LIBRARY.length) return null;
     if (SOUND_LIBRARY.length === 1) return SOUND_LIBRARY[0];
-    let candidate = SOUND_LIBRARY[Math.floor(Math.random() * SOUND_LIBRARY.length)];
-    if (currentVictorySoundUrl && candidate.url === currentVictorySoundUrl) {
-        candidate = SOUND_LIBRARY[(SOUND_LIBRARY.indexOf(candidate) + 1) % SOUND_LIBRARY.length];
+    let index = Math.floor(Math.random() * SOUND_LIBRARY.length);
+    if (currentVictorySoundUrl && SOUND_LIBRARY[index].url === currentVictorySoundUrl) {
+        index = (index + 1 + Math.floor(Math.random() * (SOUND_LIBRARY.length - 1))) % SOUND_LIBRARY.length;
     }
-    return candidate;
+    return SOUND_LIBRARY[index];
 }
 
 function stopVictorySoundLoop() {

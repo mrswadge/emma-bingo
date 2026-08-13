@@ -11,6 +11,7 @@ class EmmaBonkersViz {
     static EMMAS_PER_TAP = 4;
     static MAX_EMMAS = 52;
     static HUE_SCALE_FACTOR = 0.45;
+    static TAP_HINT_BOTTOM_OFFSET = 84;
     static MODES = ['psychedelic', 'fluid', 'tunnel', 'waveform'];
 
     constructor(canvas, imgEl) {
@@ -452,7 +453,7 @@ class EmmaBonkersViz {
         this.ctx.fillStyle = '#ffffff';
         this.ctx.shadowColor = '#000000';
         this.ctx.shadowBlur = 10;
-        this.ctx.fillText(label, W / 2, H - 84);
+        this.ctx.fillText(label, W / 2, H - EmmaBonkersViz.TAP_HINT_BOTTOM_OFFSET);
         this.ctx.restore();
     }
 }
